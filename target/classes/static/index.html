@@ -13,7 +13,7 @@
         naar updates vanaf de server over de websocket communicatie.
     -->
     <script>
-        function parseCommand(input = "") {
+        function parseCommand(input) {
             return JSON.parse(input);
         }
 
@@ -71,7 +71,9 @@
              * de server geconfigureerd hebben als connectiepunt (/connectToSimulation). Op de socket wordt een .onmessage
              * functie geregistreerd waarmee binnenkomende berichten worden afgehandeld.
              */
-            socket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connectToSimulation");
+            
+            // IntelliJ gebruikt verschillende ports voor Spring en HTTP -> hardcode de port tot er een betere oplossing is.
+            socket = new WebSocket("ws://" + window.location.hostname + ":" + 8080 + "/connectToSimulation");
             socket.onmessage = function (event) {
                 //Hier wordt het commando dat vanuit de server wordt gegeven uit elkaar gehaald
                 var command = parseCommand(event.data);
