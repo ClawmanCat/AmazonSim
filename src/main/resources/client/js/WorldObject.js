@@ -69,7 +69,7 @@ export class Robot extends WorldObject {
         new Three.MeshBasicMaterial({ map: new Three.TextureLoader(Three.DefaultLoadingManager).load("textures/robot_top.png"  ),  side: Three.DoubleSide }), //TOP
         new Three.MeshBasicMaterial({ map: new Three.TextureLoader(Three.DefaultLoadingManager).load("textures/robot_bottom.png"), side: Three.DoubleSide }), //BOTTOM
         new Three.MeshBasicMaterial({ map: new Three.TextureLoader(Three.DefaultLoadingManager).load("textures/robot_front.png" ), side: Three.DoubleSide }), //FRONT
-        new Three.MeshBasicMaterial({ map: new Three.TextureLoader(Three.DefaultLoadingManager).load("textures/robot_front.png" ), side: Three.DoubleSide }), //BACK
+        new Three.MeshBasicMaterial({ map: new Three.TextureLoader(Three.DefaultLoadingManager).load("textures/robot_front.png" ), side: Three.DoubleSide })  //BACK
     ];
 
     makeMesh() {
