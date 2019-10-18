@@ -13,4 +13,8 @@
       <module name="AmazonSimulatie" target="1.7" />
     </bytecodeTargetLevel>
   </component>
+  <component name="TypeScriptCompiler">
+    <option name="recompileOnChanges" value="true" />
+    <option name="useService" value="false" />
+  </component>
 </project>

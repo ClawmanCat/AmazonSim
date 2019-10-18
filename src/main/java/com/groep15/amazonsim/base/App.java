@@ -92,8 +92,9 @@ public class App extends SpringBootServletInitializer implements WebSocketConfig
          * kunnen sturen.
          */
         @Override
-        public void afterConnectionEstablished(WebSocketSession sesion) {
-            controller.addView(new DefaultWebSocketView(sesion));
+        public void afterConnectionEstablished(WebSocketSession session) {
+            System.out.println("New client connected: " + session.getRemoteAddress().getAddress().toString());
+            controller.addView(new DefaultWebSocketView(session));
         }
 
         /*
