@@ -1,71 +1,75 @@
-import * as Three from './lib/three.min.js';
-import * as PointerLockControls from './lib/PointerLockControls.min.js';
-import {AmbientLight, Floor} from './WorldObject.js';
+class World {
+    constructor () {
+        // ThreeJS Renderer Setup
+        this.scene = new THREE.Scene();
 
-
-export class World {
-    constructor() {
-        this.objects = [];
-
-        // Scene & renderer setup
-        this.scene = new Three.Scene();
-
-        this.renderer = new Three.WebGLRenderer({ antialias: true });
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight + 5);
+        document.body.appendChild(this.renderer.domElement);
 
-        document.getElementById("RendererTarget").replaceWith(this.renderer.domElement);
+        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
 
-        // Camera setup
-        this.camera = new Three.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-        this.cameraController = new PointerLockControls(this.camera, this.renderer.domElement);
+        //this.controller = new THREE.PointerLockControls(this.camera, this.renderer.domElement);
+        this.controller = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
-        this.camera.position = new Three.Vector3(15, 5, 15);
+        this.camera.position.z = 15;
+        this.camera.position.y = 5;
+        this.camera.position.x = 15;
 
-        // Update camera on window resize.
+        // Some camera controllers (e.g. PointerLockControls) don't have an update function,
+        // so check if the update function exists before calling it.
+        if (Utility.Exists(this.controller.update)) this.controller.update();
+
+        let self = this;
         window.addEventListener(
-            'resize',
-            function(){
-                this.camera.aspect = window.innerWidth / window.innerHeight;
-                this.camera.updateProjectionMatrix();
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-            },
+            "resize", 
+            () => {
+                self.camera.aspect = window.innerWidth / window.innerHeight;
+                self.camera.updateProjectionMatrix();
+                self.renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 
             false
         );
 
-        // Basic world layout
-        // TODO: Load this from server instead of creating it here. (And get *actual* UUIDs)
-        this.addObject(new Floor({ uuid: "fake-uuid-0001", position: new Three.Vector3(15, 0, 15), rotation: new Three.Vector3(Math.PI / 2.0, 0, 0) }));
-        this.addObject(new AmbientLight({ uuid: "fake-uuid-0002", position: new Three.Vector3(0, 0, 0), rotation: new Three.Vector3(0, 0, 0) }));
 
-        this.render();
+        // Socket updater
+        this.updater = new SocketManager(new WorldObjectFactory(this));
+
+
+        // Basic world layout.
+        // TODO: Load this from the server instead.
+        let floor = new Floor(this, Utility.MakeWorldObjectJSON("fake-uuid-01", [ 15, 0, 15 ], [ Math.PI / 2.0, 0, 0 ]));
+        let light = new AmbientLight(this, Utility.MakeWorldObjectJSON("fake-uuid-02", [ 0, 0, 0 ], [ 0, 0, 0 ], { intensity: 4, color: 0x404040 }));
+
+        this.addObject(floor);
+        this.addObject(light);
+
+
+        // Render loop
+        this.frameCount = 0;
+        this.animate = () => {
+            requestAnimationFrame(self.animate);
+            if (Utility.Exists(self.controller.update)) self.controller.update();
+            self.renderer.render(self.scene, self.camera);
+
+            ++self.frameCount;
+        };
     }
 
-
-    addObject(obj) {
-        let mesh = obj.makeMesh();
+    addObject(object) {
+        let mesh = object.mesh;
+        mesh.name = object.getID();
 
         this.scene.add(mesh);
-        this.objects.push([obj, mesh.uuid]);
     }
 
-
-    removeObject(obj) {
-        let elem = this.objects.filter(x => x[0] === obj)[0];
-
-        this.scene.remove(this.scene.getObjectByProperty("uuid", elem[1]));
-        this.objects = this.objects.filter(x => x !== elem);
+    removeObject(object) {
+        let mesh = this.scene.getObjectByName(object.getID());
+        this.scene.remove(mesh);
     }
 
-
-    getObject(uuid) {
-        let results = this.objects.filter(x => x[0].uuid === uuid);
-        return (results.length > 0) ? results[0][0] : undefined;
-    }
-
-
-    render() {
-        requestAnimationFrame(this.render);
-        this.renderer.render(this.scene, this.camera);
+    getObjectMesh(id) {
+        return this.scene.getObjectByName(id);
     }
 }

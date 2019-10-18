@@ -2,11 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Amazon Simulatie</title>
+    <title>Amazon Simulation</title>
 
-    <script src="js/Main.js" type="module"></script>
+    <script src="js/lib/three.min.js"></script>
+    <script src="js/lib/OrbitControls.min.js"></script>
+    <script src="js/lib/PointerLockControls.min.js"></script>
+
+    <script src="js/Utility.js"></script>
+    <script src="js/SocketManager.js"></script>
+    <script src="js/WorldObject.js"></script>
+    <script src="js/World.js"></script>
+
+    <script>
+        window.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                console.log("Initializing Simulation...");
+
+                let world = new World();
+                world.animate();
+
+                console.log("Initialization Completed.");
+            }
+        );
+    </script>
 </head>
 <body>
-    <canvas id="RendererTarget"></canvas>
+
 </body>
 </html>

@@ -1,38 +1,56 @@
-export class ISocketUpdatable {
-    getID()      { throw Error('Must implement abstract method getID.'); }
-    update(json) { throw Error('Must implement abstract method update.'); }
+class ISocketUpdatable {
+    update(json) { throw Error("Must implement abstract method update."); }
+    getID()      { throw Error("Must implement abstract method getID." ); }
+}
+
+class ISocketUpdatableFactory {
+    create(json) { throw Error("Must implement abstract method create."); }
 }
 
 
-export class SocketManager {
-    constructor (listenerFactory) {
-        this.listeners = new Map();
-        this.listenerFactory = listenerFactory;
+// Class that manages creating and updating objects through a socket connection.
+// Objects are identified by their UUID. If a command is received to update an object that does not exist,
+// the provided factory object is used to construct a new one.
+// Factory object must extend ISocketUpdatableFactory, the objects it constructs must extend ISocketUpdatable.
+class SocketManager {
+    static CONNECTION_ADDRESS = "ws://" + window.location.hostname + ":" + 8080 + "/connectToSimulation";
 
-        // IntelliJ gebruikt verschillende ports voor Spring en HTTP -> hardcode de port tot er een betere oplossing is.
-        this.socket = new WebSocket("ws://" + window.location.hostname + ":" + 8080 + "/connectToSimulation");
+    constructor(factory) {
+        this.factory = factory;
+        this.updatables = new Map();
+        this.socket = new WebSocket(SocketManager.CONNECTION_ADDRESS);
 
-        this.socket.onmessage = function(event) {
+        let self = this;
+        this.socket.onmessage = (event) => {
+            console.log("Received message from server: " + event.data);
+
             let json = JSON.parse(event.data);
 
             if (json.command === "object_update") {
-                let listener = this.listeners.get(json.parameters.uuid);
+                let target = self.updatables.get(json.parameters.uuid);
 
-                // Maak een nieuwe listener als deze nog niet bestaat, anders update de bestaande listener.
-                if (listener === undefined) {
-                    this.addListener(this.listenerFactory(json));
+                if (target === undefined) {
+                    // Object does not yet exist => make a new one.
+                    target = self.factory.create(json);
+
+                    self.addObject(target);
+                    console.log("Created new object with ID " + target.getID());
                 } else {
-                    listener.update(json);
+                    // Object already exists => update it.
+                    target.update(json);
+                    console.log("Updated object with ID " + target.getID());
                 }
+            } else {
+                console.log("Unknown command: " + json.command);
             }
-        }
+        };
     }
 
-    addListener(listener) {
-        this.listeners.set(listener.getID(), listener);
+    addObject(object) {
+        this.updatables.set(object.getID(), object);
     }
 
-    removeListener(listener) {
-        this.listeners.delete(listener.getID());
+    removeObject(id) {
+        this.updatables.delete(id);
     }
 }
