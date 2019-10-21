@@ -21,11 +21,7 @@ class SocketManager {
         this.socket = new WebSocket(SocketManager.CONNECTION_ADDRESS);
 
         let self = this;
-        this.socket.onmessage = (event) => {
-            console.log("Received message from server: " + event.data);
-
-            let json = JSON.parse(event.data);
-
+        this.decode = (json) => {
             if (json.command === "object_update") {
                 let target = self.updatables.get(json.parameters.uuid);
 
@@ -40,9 +36,18 @@ class SocketManager {
                     target.update(json);
                     console.log("Updated object with ID " + target.getID());
                 }
+            } else if (json.command === "compound_update") {
+                json.parameters.forEach(self.decode);
             } else {
                 console.log("Unknown command: " + json.command);
             }
+        };
+
+        this.socket.onmessage = (event) => {
+            console.log("Received message from server: " + event.data);
+
+            let json = JSON.parse(event.data);
+            self.decode(json);
         };
     }
 

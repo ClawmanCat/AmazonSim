@@ -57,6 +57,8 @@ public final class WorldReader {
                         for (JSONObject jso : legend.get(line.charAt(xCoord))) {
                             Object3D o = Object3DFactory.Create(jso, result);
                             o.setPosition(xCoord, o.getPosition().y, zCoord);
+
+                            result.addWorldObject(o);
                         }
                     }
 

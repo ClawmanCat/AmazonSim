@@ -26,7 +26,7 @@ public abstract class Controller implements Runnable, PropertyChangeListener {
 
     public Controller(Model model, List<View> views) {
         this.model = model;
-        this.model.addObserver(this); //Automatisch wordt deze controller toegevoegd aan het model om updates te ontvangen.
+        this.model.addObserver(this);
         this.views = new ArrayList<>(views);
     }
 
@@ -35,10 +35,6 @@ public abstract class Controller implements Runnable, PropertyChangeListener {
         this.onViewAdded(view);
     }
 
-    /*
-     * Deze methode kan later geïmplementeerd worden om aan te geven wat er moet
-     * gebeuren met een view die nieuw toegevoegd wordt aan de controller.
-     */
     protected abstract void onViewAdded(View view);
 
     /**
@@ -65,7 +61,7 @@ public abstract class Controller implements Runnable, PropertyChangeListener {
      * Method to start the controller in a new thread.
      */
     public final void start() {
-        new Thread(this).start();;
+        new Thread(this).start();
     }
 
     public abstract void run();

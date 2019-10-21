@@ -27,6 +27,11 @@ public class ProxyObject3D extends Object3D {
     }
 
     @Override
+    public JSONObject toJSON() {
+        return object.toJSON();
+    }
+
+    @Override
     public boolean update() {
         throw new NotImplementedException();
     }

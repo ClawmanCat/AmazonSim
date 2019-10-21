@@ -9,13 +9,12 @@ import java.util.Set;
 public final class Object3DFactory {
     private Object3DFactory() {}
 
+    // List of all classes that extend Object3D
+    private static Set<Class<? extends Object3D>> classes = new Reflections("com.groep15.amazonsim").getSubTypesOf(Object3D.class);
+
     public static Object3D Create(JSONObject json, Object... args) {
         String type = (String) json.get("type");
         if (type == null) throw new IllegalArgumentException("Attempted to construct Object3D from invalid JSON.");
-
-        // Find all classes that extend Object3D
-        Reflections rf = new Reflections("com.groep15.amazonsim");
-        Set<Class<? extends Object3D>> classes = rf.getSubTypesOf(Object3D.class);
 
         // Find the class with the same name as specified in the JSON, and return a new instance of it.
         for (Class<? extends Object3D> cls : classes) {

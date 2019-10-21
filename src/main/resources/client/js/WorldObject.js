@@ -12,6 +12,7 @@ class WorldObjectFactory extends ISocketUpdatableFactory {
             case "robot":           result = new Robot(this, json);             break;
             case "ambient_light":   result = new AmbientLight(this, json);      break;
             case "floor":           result = new Floor(this, json);             break;
+            default:                result = new Unknown(this, json);           break;
         }
 
         this.world.addObject(result);
@@ -38,7 +39,6 @@ class IWorldObject extends ISocketUpdatable {
     setPosition(position) {
         this.position = position;
 
-        // TODO: Calculate offset from ground instead of hardcoding it in server message.
         this.mesh.position.x = position.x;
         this.mesh.position.y = position.y;
         this.mesh.position.z = position.z;
@@ -48,7 +48,7 @@ class IWorldObject extends ISocketUpdatable {
         this.rotation = rotation;
 
         this.mesh.rotation.x = rotation.x;
-        this.mesh.rotation.y = rotation.y
+        this.mesh.rotation.y = rotation.y;
         this.mesh.rotation.z = rotation.z;
     }
 
@@ -86,9 +86,6 @@ class Robot extends IWorldObject {
 class AmbientLight extends IWorldObject {
     constructor (world, json) {
         super(world, json);
-
-        this.intensity = 1;
-        this.color = 0xFFFFFF;
     }
 
     update(json) {
@@ -111,11 +108,33 @@ class AmbientLight extends IWorldObject {
 
 
 class Floor extends IWorldObject {
-    // TODO: Split floor into 1x1 tiles and allow multiple textures.
-    static Geometry  = new THREE.PlaneGeometry(30, 30, 32);
-    static Materials = new THREE.MeshBasicMaterial({ color: 0xFAFAFA, side: THREE.DoubleSide });
+    static Materials = new THREE.MeshBasicMaterial({ color: 0x424242, side: THREE.DoubleSide });
+
+    constructor (world, json) {
+        super(world, json);
+    }
+
+    update(json) {
+        this.w = json.parameters.w;
+        this.h = json.parameters.h;
+
+        super.update(json);
+    }
 
     makeMesh() {
-        return new THREE.Mesh(Floor.Geometry, Floor.Materials);
+        let geometry = new THREE.PlaneGeometry(this.w, this.h, this.w, this.h);
+        return new THREE.Mesh(geometry, Floor.Materials);
+    }
+
+
+}
+
+
+class Unknown extends IWorldObject {
+    static Geometry  = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+    static Materials = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/unknown_item.png" ),  side: THREE.DoubleSide });
+
+    makeMesh() {
+        return new THREE.Mesh(Unknown.Geometry, Unknown.Materials);
     }
 }

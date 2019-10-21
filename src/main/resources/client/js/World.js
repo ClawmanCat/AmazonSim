@@ -39,10 +39,10 @@ class World {
 
         // Basic world layout.
         // TODO: Load this from the server instead.
-        let floor = new Floor(this, Utility.MakeWorldObjectJSON("fake-uuid-01", [ 15, 0, 15 ], [ Math.PI / 2.0, 0, 0 ]));
+        //let floor = new Floor(this, Utility.MakeWorldObjectJSON("fake-uuid-01", [ 15, 0, 15 ], [ Math.PI / 2.0, 0, 0 ]));
         let light = new AmbientLight(this, Utility.MakeWorldObjectJSON("fake-uuid-02", [ 0, 0, 0 ], [ 0, 0, 0 ], { intensity: 4, color: 0x404040 }));
 
-        this.addObject(floor);
+        //this.addObject(floor);
         this.addObject(light);
 
 

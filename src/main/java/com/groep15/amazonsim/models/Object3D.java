@@ -18,7 +18,6 @@ public abstract class Object3D implements Updatable {
         this.uuid = UUID.randomUUID();
     }
 
-
     public UUID getID() { return this.uuid; }
     public String getName() {
         return this.getClass().getSimpleName().toLowerCase();
@@ -54,25 +53,26 @@ public abstract class Object3D implements Updatable {
     }
 
     public void fromJSON(JSONObject o) {
-        if (o.containsKey("type") && o.get("type") != getName())
+        if (o.containsKey("type") && !o.get("type").equals(getName().toLowerCase()))
             throw new IllegalArgumentException("Attempted to create object of type " + getName() + " with JSON data for type " + o.get("type") + ".");
 
         if (o.containsKey("properties")) o = (JSONObject) o.get("properties");
         else return;    // No properties = nothing to deserialize.
 
-        this.uuid = (UUID) Coal(o.get("uuid"), UUID.randomUUID());
+        this.uuid = (o.get("uuid") == null) ? this.uuid : (UUID) o.get("uuid");
 
-        this.x = (Double) Coal(o.get("x"), 0.0);
-        this.y = (Double) Coal(o.get("y"), 0.0);
-        this.z = (Double) Coal(o.get("z"), 0.0);
+        this.x = (o.get("x") == null) ? this.x : (Double) o.get("x");
+        this.y = (o.get("y") == null) ? this.y : (Double) o.get("y");
+        this.z = (o.get("z") == null) ? this.z : (Double) o.get("z");
 
-        this.rx = (Double) Coal(o.get("rotationX"), 0.0);
-        this.ry = (Double) Coal(o.get("rotationY"), 0.0);
-        this.rz = (Double) Coal(o.get("rotationZ"), 0.0);
+        this.rx = (o.get("rotationX") == null) ? this.rx : (Double) o.get("rotationX");
+        this.ry = (o.get("rotationY") == null) ? this.ry : (Double) o.get("rotationY");
+        this.rz = (o.get("rotationZ") == null) ? this.rz : (Double) o.get("rotationZ");
     }
 
     // Null coalescing function
-    private static Object Coal(Object... objs) {
+    // TODO: Move to utility class.
+    protected static Object Coal(Object... objs) {
         for (Object o : objs) if (o != null) return o;
         return null;
     }

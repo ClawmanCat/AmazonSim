@@ -1,7 +1,7 @@
 package com.groep15.amazonsim.models;
 
-class Robot extends Object3D {
-    Robot(World world) {
+public class Robot extends Object3D {
+    public Robot(World world) {
         super(world);
     }
 
