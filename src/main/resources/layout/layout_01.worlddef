@@ -1,0 +1,24 @@
+#BEGINLEGEND
+{"key":"W", "value":[{"type":"wall",  "properties": { "y": 0.50 }}]}
+{"key":"F", "value":[{"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"S", "value":[{"type":"shelf", "properties": { "y": 0.50 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"R", "value":[{"type":"robot", "properties": { "y": 0.15 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+#ENDLEGEND
+
+
+
+#BEGINLAYOUT
+WWWWWWWWWWWWWWWWWW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WSFFSSFFSSFFSSFFSW
+WFFFFFFFFFFFFFFFFW
+WFFFFFFFFFFFFFFFFW
+WFRFFRFFRFFRFFFRFW
+WWWWWWWWWWWWWWWWWW
+#ENDLAYOUT
