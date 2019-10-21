@@ -1,11 +1,11 @@
 package com.groep15.amazonsim.controllers;
 
-import com.groep15.amazonsim.base.Command;
 import com.groep15.amazonsim.models.Model;
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.views.View;
 
 import java.beans.PropertyChangeEvent;
+import java.util.ConcurrentModificationException;
 
 public class SimulationController extends Controller {
     public SimulationController(Model model) {
@@ -27,15 +27,7 @@ public class SimulationController extends Controller {
 
     @Override
     protected void onViewAdded(final View view) {
-        final Controller t = this;
-
-        view.onViewClose(new Command(){
-        
-            @Override
-            public void execute() {
-                t.removeView(view);
-            }
-        });
+        view.onViewClose(() -> { this.removeView(view); });
 
         for (Object3D object : this.getModel().getWorldObjectsAsList()) {
             view.update(Model.UPDATE_COMMAND, object);
@@ -44,7 +36,15 @@ public class SimulationController extends Controller {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        for (View v : this.getViews()) if (v != null) v.update(evt.getPropertyName(), (Object3D) evt.getNewValue());
+        try {
+            for (View v : this.getViews()) if (v != null) v.update(evt.getPropertyName(), (Object3D) evt.getNewValue());
+        } catch (ConcurrentModificationException e) {
+            // Thrown due to some external access to one of the views when a view is being removed.
+            // This issue was already present in the code on Blackboard.
+            // No, the issue is not in onViewAdded / view.onViewClose (set in the same method), I already tried that.
+            // The best we can do for now is just catch it and produce this complaint, that nobody will probably ever bother to investigate.
+            System.out.println("View destruction caused unsupported concurrent access. This is not a good thing.");
+        }
     }
 
 }
