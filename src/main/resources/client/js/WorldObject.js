@@ -39,22 +39,25 @@ class IWorldObject extends ISocketUpdatable {
     setPosition(position) {
         this.position = position;
 
-        this.mesh.position.x = position.x;
-        this.mesh.position.y = position.y;
-        this.mesh.position.z = position.z;
+        if (this.mesh !== null) {
+            this.mesh.position.x = position.x;
+            this.mesh.position.y = position.y;
+            this.mesh.position.z = position.z;
+        }
     }
 
     setRotation(rotation) {
         this.rotation = rotation;
 
-        this.mesh.rotation.x = rotation.x;
-        this.mesh.rotation.y = rotation.y;
-        this.mesh.rotation.z = rotation.z;
+        if (this.mesh !== null) {
+            this.mesh.rotation.x = rotation.x;
+            this.mesh.rotation.y = rotation.y;
+            this.mesh.rotation.z = rotation.z;
+        }
     }
 
     update(json) {
         this.uuid = json.parameters.uuid;
-        if (this.mesh === null) this.mesh = this.makeMesh();
 
         this.setPosition(new THREE.Vector3(json.parameters.x, json.parameters.y, json.parameters.z));
         this.setRotation(new THREE.Vector3(json.parameters.rotationX, json.parameters.rotationY, json.parameters.rotationZ));
@@ -62,6 +65,17 @@ class IWorldObject extends ISocketUpdatable {
 
     getID()  {
         return this.uuid;
+    }
+
+    getMesh() {
+        if (this.mesh === null) {
+            this.mesh = this.makeMesh();
+
+            this.setPosition(this.position);
+            this.setRotation(this.rotation);
+        }
+
+        return this.mesh;
     }
 }
 
@@ -134,7 +148,17 @@ class Unknown extends IWorldObject {
     static Geometry  = new THREE.BoxGeometry(1.0, 1.0, 1.0);
     static Materials = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/unknown_item.png" ),  side: THREE.DoubleSide });
 
+    constructor(world, json) {
+        super(world, json);
+
+        this.texture = json.parameters.texture;
+    }
+
     makeMesh() {
-        return new THREE.Mesh(Unknown.Geometry, Unknown.Materials);
+        let materials = this.texture === undefined
+            ? Unknown.Materials
+            : new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/" + this.texture + ".png" ),  side: THREE.DoubleSide });
+
+        return new THREE.Mesh(Unknown.Geometry, materials);
     }
 }

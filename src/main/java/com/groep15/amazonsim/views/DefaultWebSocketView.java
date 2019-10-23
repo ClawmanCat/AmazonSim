@@ -18,13 +18,13 @@ public class DefaultWebSocketView implements View {
 
     @Override
     public void update(String event, Object3D data) {
-        JSONObject json = new JSONObject();
-        json.put("command", event);
-        json.put("parameters", data.toJSON());
-
         synchronized (session) {
             try {
                 if (this.session.isOpen()) {
+                    JSONObject json = new JSONObject();
+                    json.put("command", event);
+                    json.put("parameters", data.toJSON());
+
                     this.session.sendMessage(new TextMessage(json.toJSONString()));
                 } else {
                     this.onClose.execute();

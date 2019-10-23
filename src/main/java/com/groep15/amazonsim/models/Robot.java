@@ -1,20 +1,45 @@
 package com.groep15.amazonsim.models;
 
-public class Robot extends Object3D {
+import com.groep15.amazonsim.ai.ActionIdle;
+import com.groep15.amazonsim.ai.IWorldAction;
+import com.groep15.amazonsim.ai.IWorldActor;
+
+public class Robot extends Object3D implements IWorldActor {
+    private IWorldAction action;
+    private boolean changedFromAction;
+
     public Robot(World world) {
         super(world);
+
+        this.passable = true;
+        this.action = new ActionIdle();
+        this.changedFromAction = this.action.onActionStart(this);
     }
 
     @Override
     public boolean update() {
-        int tick = world.getTickCount();
+        if (this.action.progress(this) || changedFromAction) {
+            changedFromAction = false;
+            return true;
+        }
 
-        // Move in circles.
-        if (tick % 32 < 8) x += 0.5;
-        else if (tick % 32 < 16) z += 0.5;
-        else if (tick % 32 < 24) x -= 0.5;
-        else z -= 0.5;
+        return false;
+    }
 
-        return true;
+    @Override
+    public double getSpeed() {
+        return 0.25;
+    }
+
+    @Override
+    public void setAction(IWorldAction action) {
+        this.changedFromAction |= this.action.onActionDone(this);
+        this.action = action;
+        this.changedFromAction |= this.action.onActionStart(this);
+    }
+
+    @Override
+    public IWorldAction getAction() {
+        return this.action;
     }
 }

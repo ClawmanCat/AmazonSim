@@ -8,6 +8,7 @@ public class Floor extends Object3D {
     public Floor(World world) {
         super(world);
 
+        this.passable = true;
         this.rx = Math.PI / 2.0;
         this.w = 1;
         this.h = 1;
@@ -31,7 +32,7 @@ public class Floor extends Object3D {
     public void fromJSON(JSONObject o) {
         super.fromJSON(o);
 
-        this.w = (Double) Coal(o.get("w"), this.w);
-        this.h = (Double) Coal(o.get("h"), this.h);
+        this.w = (o.get("w") == null) ? this.w : (Double) o.get("w");
+        this.h = (o.get("h") == null) ? this.h : (Double) o.get("h");
     }
 }

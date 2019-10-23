@@ -41,9 +41,10 @@ public final class WorldReader {
             }
 
             // 2nd pass: read world layout.
-            World result = new World();
+            World result = new World(1, 1);
             boolean inLayout = false;
             int zCoord = 0;
+            int xMax = 0;
 
             for (String line : contents) {
                 // Set state to start reading layout.
@@ -60,12 +61,15 @@ public final class WorldReader {
 
                             result.addWorldObject(o);
                         }
+
+                        if (xCoord > xMax) xMax = xCoord;
                     }
 
                     ++zCoord;
                 }
             }
 
+            result.setSize(xMax + 1, zCoord);
             return result;
         } catch (IOException e) {
             throw new RuntimeException("Reading world from disk failed: " + e.getMessage());

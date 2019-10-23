@@ -1,7 +1,10 @@
 package com.groep15.amazonsim.models;
 
+import com.sun.javafx.geom.Vec3d;
 import org.json.simple.JSONObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.UUID;
 
 public class ProxyObject3D extends Object3D {
     private Object3D object;
@@ -9,6 +12,36 @@ public class ProxyObject3D extends Object3D {
     public ProxyObject3D(Object3D object) {
         super(object.world);
         this.object = object;
+    }
+
+    @Override
+    public UUID getID() {
+        return this.object.getID();
+    }
+
+    @Override
+    public String getName() {
+        return this.object.getName();
+    }
+
+    @Override
+    public Vec3d getPosition() {
+        return this.object.getPosition();
+    }
+
+    @Override
+    public Vec3d getRotation() {
+        return this.object.getRotation();
+    }
+
+    @Override
+    public Vec3d getSize() {
+        return this.object.getSize();
+    }
+
+    @Override
+    public boolean getIsPassable() {
+        return this.object.getIsPassable();
     }
 
     @Override

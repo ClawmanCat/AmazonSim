@@ -1,21 +1,28 @@
 package com.groep15.amazonsim.models;
 
+import com.groep15.amazonsim.utility.JSONAble;
 import com.sun.javafx.geom.Vec3d;
 import org.json.simple.JSONObject;
 
 import java.util.UUID;
 
-public abstract class Object3D implements Updatable {
+public abstract class Object3D implements Updatable, JSONAble {
     protected World world;
     protected double x, y, z;
+    protected double sx, sy, sz;
     protected double rx, ry, rz;
     protected UUID uuid;
+    protected boolean passable;
 
     Object3D(World world) {
         this.world = world;
+
         this.x  = this.y  = this.z  = 0.0;
         this.rx = this.ry = this.rz = 0.0;
+        this.sx = this.sy = this.sz = 0.5;
+
         this.uuid = UUID.randomUUID();
+        this.passable = false;
     }
 
     public UUID getID() { return this.uuid; }
@@ -25,6 +32,7 @@ public abstract class Object3D implements Updatable {
 
     public Vec3d getPosition() { return new Vec3d(x, y, z); }
     public Vec3d getRotation() { return new Vec3d(rx, ry, rz); }
+    public Vec3d getSize()     { return new Vec3d(sx, sy, sz); }
 
     public void setPosition(double x, double y, double z) {
         this.x = x; this.y = y; this.z = z;
@@ -34,6 +42,9 @@ public abstract class Object3D implements Updatable {
         this.rx = x; this.ry = y; this.rz = z;
     }
 
+    public World getWorld() { return world; }
+
+    public boolean getIsPassable() { return passable; }
 
     public JSONObject toJSON() {
         JSONObject result = new JSONObject();
@@ -68,12 +79,5 @@ public abstract class Object3D implements Updatable {
         this.rx = (o.get("rotationX") == null) ? this.rx : (Double) o.get("rotationX");
         this.ry = (o.get("rotationY") == null) ? this.ry : (Double) o.get("rotationY");
         this.rz = (o.get("rotationZ") == null) ? this.rz : (Double) o.get("rotationZ");
-    }
-
-    // Null coalescing function
-    // TODO: Move to utility class.
-    protected static Object Coal(Object... objs) {
-        for (Object o : objs) if (o != null) return o;
-        return null;
     }
 }

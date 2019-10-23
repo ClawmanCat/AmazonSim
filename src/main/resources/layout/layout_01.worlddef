@@ -1,3 +1,5 @@
+This file is used to test loading of the world from a file.
+
 #BEGINLEGEND
 {"key":"W", "value":[{"type":"wall",  "properties": { "y": 0.50 }}]}
 {"key":"F", "value":[{"type":"floor", "properties": { "y": 0.00, "rx":1.57 }}]}

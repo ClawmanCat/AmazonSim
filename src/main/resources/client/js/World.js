@@ -11,7 +11,24 @@ class World {
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
 
         //this.controller = new THREE.PointerLockControls(this.camera, this.renderer.domElement);
-        this.controller = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controller = new THREE.PointerLockControls(this.camera, this.renderer.domElement);
+        this.w = this.s = this.a = this.d = this.up = this.dn = false;
+
+        let keyfn = (e, down) => {
+            switch (e.key) {
+                case "w":       self.w  = down; break;
+                case "a":       self.a  = down; break;
+                case "s":       self.s  = down; break;
+                case "d":       self.d  = down; break;
+                case " ":       self.up = down; break;
+                case "Shift":   self.dn = down; break;
+                case "Escape":  self.controller.unlock(); break;
+            }
+        };
+
+        window.addEventListener("click", () => { self.controller.lock(); }, false);
+        window.addEventListener('keydown', (e) => keyfn(e, true ), false);
+        window.addEventListener('keyup',   (e) => keyfn(e, false), false);
 
         this.camera.position.z = 15;
         this.camera.position.y = 5;
@@ -49,6 +66,17 @@ class World {
         // Render loop
         this.frameCount = 0;
         this.animate = () => {
+            // Move camera.
+            if (self.controller.isLocked) {
+                let dx = ((self.d  ? 1.0 : 0.0) - (self.a  ? 1.0 : 0.0)) * 0.1;
+                let dy = ((self.up ? 1.0 : 0.0) - (self.dn ? 1.0 : 0.0)) * 0.1;
+                let dz = ((self.w  ? 1.0 : 0.0) - (self.s  ? 1.0 : 0.0)) * 0.1;
+
+                self.controller.moveRight(dx);
+                self.controller.moveForward(dz);
+                self.controller.getObject().position.y += dy;
+            }
+
             requestAnimationFrame(self.animate);
             if (Utility.Exists(self.controller.update)) self.controller.update();
             self.renderer.render(self.scene, self.camera);
@@ -58,7 +86,7 @@ class World {
     }
 
     addObject(object) {
-        let mesh = object.mesh;
+        let mesh = object.getMesh();
         mesh.name = object.getID();
 
         this.scene.add(mesh);
