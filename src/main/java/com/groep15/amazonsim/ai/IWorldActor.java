@@ -1,7 +1,7 @@
 package com.groep15.amazonsim.ai;
 
 import com.groep15.amazonsim.models.World;
-import com.sun.javafx.geom.Vec3d;
+import com.groep15.amazonsim.utility.Vec3d;
 
 public interface IWorldActor {
     double getSpeed();

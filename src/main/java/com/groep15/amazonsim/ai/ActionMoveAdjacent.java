@@ -2,7 +2,7 @@ package com.groep15.amazonsim.ai;
 
 import com.groep15.amazonsim.utility.Direction;
 import com.groep15.amazonsim.utility.Utility;
-import com.sun.javafx.geom.Vec3d;
+import com.groep15.amazonsim.utility.Vec3d;
 
 public class ActionMoveAdjacent implements IWorldAction {
     private Vec3d old;

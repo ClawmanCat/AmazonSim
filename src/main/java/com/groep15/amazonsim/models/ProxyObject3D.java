@@ -1,6 +1,6 @@
 package com.groep15.amazonsim.models;
 
-import com.sun.javafx.geom.Vec3d;
+import com.groep15.amazonsim.utility.Vec3d;
 import org.json.simple.JSONObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

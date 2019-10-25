@@ -1,7 +1,7 @@
 package com.groep15.amazonsim.models;
 
 import com.groep15.amazonsim.utility.JSONAble;
-import com.sun.javafx.geom.Vec3d;
+import com.groep15.amazonsim.utility.Vec3d;
 import org.json.simple.JSONObject;
 
 import java.util.UUID;

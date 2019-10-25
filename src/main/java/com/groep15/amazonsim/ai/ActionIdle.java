@@ -1,6 +1,6 @@
 package com.groep15.amazonsim.ai;
 
-import com.sun.javafx.geom.Vec3d;
+import com.groep15.amazonsim.utility.Vec3d;
 
 public class ActionIdle implements IWorldAction {
     private boolean idle = false;
