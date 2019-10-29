@@ -2,7 +2,7 @@ package com.groep15.amazonsim.models;
 
 import com.groep15.amazonsim.utility.Vec3d;
 import org.json.simple.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import java.lang.UnsupportedOperationException;
 
 import java.util.UUID;
 
@@ -46,17 +46,17 @@ public class ProxyObject3D extends Object3D {
 
     @Override
     public void setPosition(double x, double y, double z) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setRotation(double x, double y, double z) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void fromJSON(JSONObject o) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -66,6 +66,6 @@ public class ProxyObject3D extends Object3D {
 
     @Override
     public boolean update() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

@@ -2,7 +2,6 @@ package com.groep15.amazonsim.utility;
 
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
-import javafx.util.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
