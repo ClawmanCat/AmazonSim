@@ -6,6 +6,7 @@ import com.groep15.amazonsim.utility.Wrapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class ObjectTracker {
     public static final int ShelfCapacity = 8;
@@ -38,6 +39,13 @@ public class ObjectTracker {
         SKULocations.remove(item.SKU).removeItem(item);
     }
 
+    public WarehouseItem randomItem() {
+        Random r = new Random();
+
+        Map.Entry<Integer, Shelf> entry = (Map.Entry<Integer, Shelf>) SKULocations.entrySet().toArray()[r.nextInt(SKULocations.size())];
+        return entry.getValue().getItem(entry.getKey());
+    }
+
     public Shelf findItem(WarehouseItem item) {
         return SKULocations.get(item.SKU);
     }
@@ -48,5 +56,16 @@ public class ObjectTracker {
         }
 
         return null;
+    }
+
+    public Shelf randomShelf() {
+        Random r = new Random();
+
+        Map.Entry<Shelf, Wrapper<Integer>> entry = (Map.Entry<Shelf, Wrapper<Integer>>) shelfSpace.entrySet().toArray()[r.nextInt(shelfSpace.size())];
+        return entry.getKey();
+    }
+
+    public int storedItemCount() {
+        return SKULocations.size();
     }
 }

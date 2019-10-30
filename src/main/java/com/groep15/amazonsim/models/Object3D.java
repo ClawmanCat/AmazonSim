@@ -13,6 +13,7 @@ public abstract class Object3D implements Updatable, JSONAble {
     protected double rx, ry, rz;
     protected UUID uuid;
     protected boolean passable;
+    public boolean dirty = false;
 
     Object3D(World world) {
         this.world = world;

@@ -13,6 +13,8 @@ public class Shelf extends Object3D {
 
     public Shelf(World world) {
         super(world);
+
+        this.sy = 1.15;
     }
 
     @Override
@@ -46,5 +48,16 @@ public class Shelf extends Object3D {
     public void removeItem(WarehouseItem item) {
         items.remove(item);
         contentsChanged = true;
+    }
+
+    public WarehouseItem getItem(int SKU) {
+        return items.stream()
+                .filter(x -> x.SKU == SKU)
+                .findFirst()
+                .get();
+    }
+
+    public int getItemCount() {
+        return items.size();
     }
 }

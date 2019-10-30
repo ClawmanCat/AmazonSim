@@ -1,8 +1,15 @@
 package com.groep15.amazonsim.ai;
 
+import com.groep15.amazonsim.utility.Direction;
+
+import java.util.List;
+
 public interface IWorldAction {
     boolean progress(IWorldActor obj);
+    boolean isDone();
 
-    boolean onActionStart(IWorldActor obj);
-    boolean onActionDone(IWorldActor obj);
+    List<Direction> getMovementFuture();
+    void clearMovementFuture();
+
+    void onWorldChanged();
 }

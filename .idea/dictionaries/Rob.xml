@@ -1,7 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="Rob">
     <words>
+      <w>collider</w>
+      <w>coord</w>
+      <w>oldpos</w>
       <w>passability</w>
+      <w>shelfpos</w>
     </words>
   </dictionary>
 </component>
