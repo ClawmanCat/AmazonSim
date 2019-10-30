@@ -24,8 +24,9 @@ import java.io.IOException;
 @EnableAutoConfiguration
 @EnableWebSocket
 public class App extends SpringBootServletInitializer implements WebSocketConfigurer {
-    public static final String WORLD_PATH = new File("src/main/resources/layout/layout_02.worlddef").getAbsolutePath();
+    public static final String WORLD_PATH = new File("src/main/resources/layout/layout_04.worlddef").getAbsolutePath();
 
+    public static Controller Controller;
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
@@ -35,6 +36,8 @@ public class App extends SpringBootServletInitializer implements WebSocketConfig
     public App() {
         this.controller = new SimulationController(WorldReader.ReadWorld(WORLD_PATH));
         this.controller.start();
+
+        Controller = controller;
     }
 
     @Override

@@ -12,6 +12,7 @@ class WorldObjectFactory extends ISocketUpdatableFactory {
             case "robot":           result = new Robot(this, json);             break;
             case "ambient_light":   result = new AmbientLight(this, json);      break;
             case "floor":           result = new Floor(this, json);             break;
+            case "shelf":           result = new Shelf(this, json);             break;
             default:                result = new Unknown(this, json);           break;
         }
 
@@ -97,6 +98,23 @@ class Robot extends IWorldObject {
 }
 
 
+class Shelf extends IWorldObject {
+    static Geometry  = new THREE.BoxGeometry(1, 2.3, 1);
+    static Materials = [
+        Utility.LoadTextureOrDefault("shelf_side"  ), //RIGHT
+        Utility.LoadTextureOrDefault("shelf_side"  ), //LEFT
+        Utility.LoadTextureOrDefault("shelf_top"   ), //TOP
+        Utility.LoadTextureOrDefault("shelf_bottom"), //BOTTOM
+        Utility.LoadTextureOrDefault("shelf_side"  ), //FRONT
+        Utility.LoadTextureOrDefault("shelf_side"  )  //BACK
+    ];
+
+    makeMesh() {
+        return new THREE.Mesh(Shelf.Geometry, Shelf.Materials);
+    }
+}
+
+
 class AmbientLight extends IWorldObject {
     constructor (world, json) {
         super(world, json);
@@ -131,13 +149,16 @@ class Floor extends IWorldObject {
     update(json) {
         this.w = json.parameters.w;
         this.h = json.parameters.h;
+        this.texture = json.parameters.texture;
 
         super.update(json);
     }
 
     makeMesh() {
         let geometry = new THREE.PlaneGeometry(this.w, this.h, this.w, this.h);
-        return new THREE.Mesh(geometry, Floor.Materials);
+        let materials = Utility.LoadTextureOrDefault(this.texture, Floor.Materials, true);
+
+        return new THREE.Mesh(geometry, materials);
     }
 
 
@@ -155,9 +176,7 @@ class Unknown extends IWorldObject {
     }
 
     makeMesh() {
-        let materials = this.texture === undefined
-            ? Unknown.Materials
-            : new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/" + this.texture + ".png" ),  side: THREE.DoubleSide });
+        let materials = Utility.LoadTextureOrDefault(this.texture, Unknown.Materials);
 
         return new THREE.Mesh(Unknown.Geometry, materials);
     }

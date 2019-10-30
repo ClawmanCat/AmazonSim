@@ -26,6 +26,10 @@ public abstract class Controller implements Runnable, PropertyChangeListener {
         this.onViewAdded(view);
     }
 
+    public boolean hasViews() {
+        return views.size() > 0;
+    }
+
     protected abstract void onViewAdded(View view);
 
     /**

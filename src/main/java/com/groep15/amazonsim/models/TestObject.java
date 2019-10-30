@@ -5,8 +5,6 @@ import org.json.simple.JSONObject;
 public class TestObject extends Object3D {
     public TestObject(World world) {
         super(world);
-
-        this.passable = true;
     }
 
     @Override

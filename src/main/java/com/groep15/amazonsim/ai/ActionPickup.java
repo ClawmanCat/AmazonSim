@@ -1,27 +1,32 @@
 package com.groep15.amazonsim.ai;
 
+import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.utility.Direction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ActionIdle implements IWorldAction {
-    private boolean done = false;
+public class ActionPickup implements IWorldAction {
+    private Object3D target;
+
+    public ActionPickup(Object3D target) {
+        this.target = target;
+    }
 
     @Override
     public boolean progress(IWorldActor obj) {
-        if (this.isDone()) return false;
+        if (isDone()) return false;
 
-        obj.setPosition(Math.round(obj.getPosition().x), obj.getPosition().y, Math.round(obj.getPosition().z));
-        this.done = true;
+        obj.grab(target);
+        this.target = null;
 
         return true;
     }
 
     @Override
     public boolean isDone() {
-        return done;
+        return target == null;
     }
 
     @Override

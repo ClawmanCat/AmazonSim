@@ -1,9 +1,8 @@
 package com.groep15.amazonsim.wms;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import com.groep15.amazonsim.models.Shelf;
+
+import java.util.*;
 
 public class WarehouseItemFactory {
     private static final String[] Products = {
@@ -39,15 +38,38 @@ public class WarehouseItemFactory {
         }
     }
 
-    public void create(ObjectTracker tracker, int count) {
+    public List<WarehouseItem> create(ObjectTracker tracker, int count, boolean track) {
+        List<WarehouseItem> items = new ArrayList<>();
+
         for (int i = 0; i < count; ++i) {
             Manufacturer mf = Manufacturers[rng.nextInt(Manufacturers.length)];
             Product p = mf.getProducts().get(rng.nextInt(mf.getProducts().size()));
 
-            tracker.addItem(
-                new WarehouseItem(nextSKU++, p),
-                tracker.findShelfWithSpace()
-            );
+            WarehouseItem item = new WarehouseItem(nextSKU++, p);
+            items.add(item);
+
+            if (track) tracker.addItem(item, tracker.findShelfWithSpace());
         }
+
+        return items;
+    }
+
+    public List<WarehouseItem> create(ObjectTracker tracker, Shelf shelf, int count, boolean track) {
+        List<WarehouseItem> items = new ArrayList<>();
+
+        if (shelf.getItemCount() + count > ObjectTracker.ShelfCapacity)
+            throw new IllegalArgumentException("Cannot fill shelf with " + count + " items when it has room for " + (ObjectTracker.ShelfCapacity - shelf.getItemCount()));
+
+        for (int i = 0; i < count; ++i) {
+            Manufacturer mf = Manufacturers[rng.nextInt(Manufacturers.length)];
+            Product p = mf.getProducts().get(rng.nextInt(mf.getProducts().size()));
+
+            WarehouseItem item =  new WarehouseItem(nextSKU++, p);
+            items.add(item);
+
+            if (track) tracker.addItem(item, shelf);
+        }
+
+        return items;
     }
 }

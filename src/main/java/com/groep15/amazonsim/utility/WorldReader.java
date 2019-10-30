@@ -6,8 +6,8 @@ import javafx.util.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,6 +20,8 @@ public final class WorldReader {
     private WorldReader() {}
 
     public static World ReadWorld(String path) {
+        // TODO: Merge everything into one pass.
+
         try {
             List<String> contents = Files.readAllLines(Paths.get(path), StandardCharsets.US_ASCII);
 
@@ -70,8 +72,26 @@ public final class WorldReader {
             }
 
             result.setSize(xMax + 1, zCoord);
+
+            // 3rd pass: load properties
+            boolean inProperties = false;
+            StringBuilder propstring = new StringBuilder();
+
+            for (String line : contents) {
+                // Set state to start reading properties.
+                if (line.equals("#BEGINPROPERTIES")) { inProperties = true; continue; }
+                // Set state to stop reading properties.
+                if (line.equals("#ENDPROPERTIES")) { inProperties = false; continue; }
+
+                // Read properties
+                if (inProperties) propstring.append(line).append(" ");
+            }
+
+            JSONParser parser = new JSONParser();
+            result.loadSettings((JSONObject) parser.parse(propstring.toString()));
+
             return result;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Reading world from disk failed: " + e.getMessage());
         }
     }

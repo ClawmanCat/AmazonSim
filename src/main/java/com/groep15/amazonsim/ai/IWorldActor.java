@@ -1,5 +1,6 @@
 package com.groep15.amazonsim.ai;
 
+import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
 import com.groep15.amazonsim.utility.Vec3d;
 
@@ -14,6 +15,10 @@ public interface IWorldActor {
 
     World getWorld();
 
-    void setAction(IWorldAction action);
+    void setAction(com.groep15.amazonsim.ai.IWorldAction action);
     IWorldAction getAction();
+
+    void grab(Object3D object);
+    void release();
+    Object3D getHeldObject();
 }
