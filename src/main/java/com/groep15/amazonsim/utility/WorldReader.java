@@ -2,7 +2,7 @@ package com.groep15.amazonsim.utility;
 
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
-import javafx.util.Pair;
+import org.javatuples.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -38,7 +38,7 @@ public final class WorldReader {
                 // Read legend.
                 if (inLegend) {
                     Pair<Character, JSONObject[]> kv = DecodeLegendEntry(line);
-                    legend.put(kv.getKey(), kv.getValue());
+                    legend.put(kv.getValue0(), kv.getValue1());
                 }
             }
 
