@@ -6,40 +6,60 @@ import com.groep15.amazonsim.ai.IWorldActor;
 
 public class Robot extends Object3D implements IWorldActor {
     private IWorldAction action;
-    private boolean changedFromAction;
+    private Object3D obj;
 
     public Robot(World world) {
         super(world);
 
         this.passable = true;
+        this.sy = 0.15;
+
         this.action = new ActionIdle();
-        this.changedFromAction = this.action.onActionStart(this);
     }
 
     @Override
     public boolean update() {
-        if (this.action.progress(this) || changedFromAction) {
-            changedFromAction = false;
-            return true;
+        if (obj != null) {
+            obj.setPosition(this.x, this.y  - this.sy + obj.sy + 0.005, this.z);
+            obj.setRotation(this.rx, this.ry, this.rz);
+
+            obj.dirty = true;
         }
 
-        return false;
+        return this.action.progress(this);
     }
 
     @Override
     public double getSpeed() {
-        return 0.25;
+        return 0.05;
     }
 
     @Override
     public void setAction(IWorldAction action) {
-        this.changedFromAction |= this.action.onActionDone(this);
         this.action = action;
-        this.changedFromAction |= this.action.onActionStart(this);
     }
 
     @Override
     public IWorldAction getAction() {
         return this.action;
+    }
+
+    @Override
+    public void grab(Object3D object) {
+        this.obj = object;
+        world.getWorldGraph().update();
+    }
+
+    @Override
+    public void release() {
+        this.obj.y = this.obj.sy;
+        this.obj = null;
+
+        world.getWorldGraph().update();
+    }
+
+    @Override
+    public Object3D getHeldObject() {
+        return this.obj;
     }
 }

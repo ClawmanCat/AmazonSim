@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ActionIdle implements IWorldAction {
+public class ActionRelease implements IWorldAction {
     private boolean done = false;
 
     @Override
     public boolean progress(IWorldActor obj) {
-        if (this.isDone()) return false;
+        if (isDone()) return false;
 
-        obj.setPosition(Math.round(obj.getPosition().x), obj.getPosition().y, Math.round(obj.getPosition().z));
+        obj.release();
         this.done = true;
 
         return true;

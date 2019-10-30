@@ -1,27 +1,33 @@
 package com.groep15.amazonsim.ai;
 
+import com.groep15.amazonsim.base.Command;
 import com.groep15.amazonsim.utility.Direction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ActionIdle implements IWorldAction {
-    private boolean done = false;
+// Wrapper around command to run it as an action.
+public class ActionRunCommand implements IWorldAction {
+    private Command command;
+
+    public ActionRunCommand(Command command) {
+        this.command = command;
+    }
 
     @Override
     public boolean progress(IWorldActor obj) {
         if (this.isDone()) return false;
 
-        obj.setPosition(Math.round(obj.getPosition().x), obj.getPosition().y, Math.round(obj.getPosition().z));
-        this.done = true;
+        this.command.execute();
+        this.command = null;
 
         return true;
     }
 
     @Override
     public boolean isDone() {
-        return done;
+        return command == null;
     }
 
     @Override

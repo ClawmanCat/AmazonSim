@@ -1,76 +1,130 @@
 package com.groep15.amazonsim.utility;
 
+import com.groep15.amazonsim.ai.IWorldActor;
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
-import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class WorldGraph {
-    private boolean[][] passable;
+    private boolean[][] map;
     private World world;
+    private List<IWorldActor> actors;
+
 
     public WorldGraph(World world) {
         this.world = world;
-        this.update();
+        this.map = null;
     }
 
     public void update() {
-        this.passable = new boolean[world.getSize().x][world.getSize().y];
-        for (boolean[] arr : this.passable) Arrays.fill(arr, true);
+        this.actors = world.getActors();
 
-        for (Object3D o : world.getWorldObjectsAsList()) {
-            Vec2i pos = new Vec2i(o.getPosition().x, o.getPosition().z);
-            if (pos.x >= world.getSize().x || pos.y >= world.getSize().y) continue;
+        boolean[][] old = map;
+        this.map = new boolean[world.getSize().x][world.getSize().y];
 
-            this.passable[pos.x][pos.y] &= o.getIsPassable();
+        for (boolean[] arr : this.map) Arrays.fill(arr, true);
+
+        boolean changed = false;
+        for (Object3D o : world.getWorldObjectsModifyiable()) {
+            if (o.getIsPassable()) continue;
+
+            Vec2i pos = new Vec2i(Math.round(o.getPosition().x), Math.round(o.getPosition().z));
+
+            // Bounds check
+            if (pos.x >= world.getSize().x || pos.y >= world.getSize().y)   continue;
+            if (pos.x < 0 || pos.y < 0)                                     continue;
+
+            // Don't count objects that are being moved by an actor.
+            boolean carried = false;
+            for (IWorldActor actor : actors) if (actor.getHeldObject() == o) { carried = true; break; }
+            if (carried) continue;
+
+            map[pos.x][pos.y] = false;
+            if (old != null && old[pos.x][pos.y] != map[pos.x][pos.y]) changed = true;
         }
+
+        if (changed) for (IWorldActor actor : actors) actor.getAction().onWorldChanged();
     }
 
-    public List<Direction> calculatePath(Vec2i from, Vec2i to) {
-        Pair<Integer, Direction>[][] costs = new Pair[this.passable.length][this.passable[0].length];
-        for (Pair<Integer, Direction>[] arr : costs) Arrays.fill(arr, new Pair<>(Integer.MAX_VALUE, Direction.NONE));
 
-        System.out.println("Calculating paths from " + from.toString());
-        calculatePathsRecursive(costs, from, 0, Direction.NONE);
+    // Find the shortest path through BFS.
+    public List<Direction> calculatePath(IWorldActor actor, Vec2i from, Vec2i to, int startDelay) {
+        if (map == null) update();
 
-        System.out.println("Retrace: " + to.toString() + " --> " + from.toString());
-        List<Direction> path = retracePathRecursive(new ArrayList<Direction>(), costs, to, from);
-        Collections.reverse(path);
+        Map<Vec2i, Direction> parents = new HashMap<>();
+        Queue<Vec2i> queue = new LinkedList<>();
 
-        return path;
-    }
+        parents.put(from, Direction.NONE);
+        queue.add(from);
 
-    private void calculatePathsRecursive(Pair<Integer, Direction>[][] costs, Vec2i at, int cost, Direction from) {
-        System.out.println("@ " + at.toString() + ", cost = " + cost + " reached from " + from.toString());
+        while (queue.size() > 0) {
+            Vec2i pos = queue.remove();
 
-        costs[at.x][at.y] = new Pair<>(cost, from);
+            // Retrace path if at destination.
+            if (pos.equals(to)) {
+                List<Direction> path = new ArrayList<>();
 
-        for (Direction d : Direction.values()) {
-            Vec2i next = new Vec2i(at.x + d.movement.x, at.y + d.movement.y);
+                Vec2i next = pos;
+                while (!next.equals(from)) {
+                    Direction d = parents.get(next);
 
-            if (next.x >= costs.length || next.x < 0)       continue;       // Bounds check x-coordinate
-            if (next.y >= costs[0].length || next.y < 0)    continue;       // Bounds check y-coordinate
-            if (!this.passable[next.x][next.y])             continue;       // Passability check
-            if (costs[next.x][next.y].getKey() <= cost + 1) continue;       // Cost check
+                    path.add(d.invert());
+                    next = new Vec2i(next.x + d.movement.x, next.y + d.movement.y);
+                }
 
-            calculatePathsRecursive(costs, next, cost + 1, d);
+                Collections.reverse(path);
+
+                return path;
+            }
+
+            for (Direction d : Direction.values()) {
+                Vec2i next = new Vec2i(pos.x + d.movement.x, pos.y + d.movement.y);
+
+                if (next.x < 0 || next.x >= map.length)             continue;       // Check X-coord inside bounds.
+                if (next.y < 0 || next.y >= map[next.x].length)     continue;       // Check Y-coord inside bounds.
+                if (!map[next.x][next.y] && !next.equals(to))       continue;       // Check space not occupied. (can always move to dest.)
+                if (parents.containsKey(next))                      continue;       // Check node already discovered.
+
+                parents.put(next, d.invert());
+                queue.add(next);
+            }
         }
+
+        return null;    // No path exists.
     }
 
-    private List<Direction> retracePathRecursive(List<Direction> list, Pair<Integer, Direction>[][] costs, Vec2i at, Vec2i dest) {
-        System.out.println("@ " + at.toString() + " reached from " + costs[at.x][at.y].getValue().toString());
 
-        if (at.equals(dest)) return list;
+    // Will the given path collide with anyone in the future?
+    public boolean willCollide(IWorldActor actor, Vec2i start, List<Direction> path) {
+        Map<Vec2i, List<Integer>> occupations = new HashMap<>();
 
-        list.add(costs[at.x][at.y].getValue());
+        for (IWorldActor a : this.actors) {
+            if (a == actor) continue;
 
-        Direction nextDir = costs[at.x][at.y].getValue().invert();
-        Vec2i next = new Vec2i(at.x +nextDir.movement.x, at.y + nextDir.movement.y);
+            List<Vec2i> positions = Utility.DirectionsToPositions(
+                    a.getAction().getMovementFuture(),
+                    new Vec2i(a.getPosition().x, a.getPosition().z)
+            );
 
-        return retracePathRecursive(list, costs, next, dest);
+            for (int i = 0; i < positions.size(); ++i) {
+                Vec2i pos = positions.get(i);
+
+                // Occupy in the ticks before and after as well, to prevent collisions when moving in / out.
+                for (int dt = -2; dt <= 2; ++dt) {
+                    if (occupations.containsKey(pos)) occupations.get(pos).add(i + dt);
+                    else occupations.put(pos, new ArrayList<>(Arrays.asList(i + dt)));
+                }
+            }
+        }
+
+        List<Vec2i> positions = Utility.DirectionsToPositions(path, start);
+        for (int i = 0; i < positions.size(); ++i) {
+            Vec2i pos = positions.get(i);
+
+            if (occupations.containsKey(pos) && occupations.get(pos).contains(i)) return true;
+        }
+
+        return false;
     }
 }

@@ -1,0 +1,36 @@
+This file is used to test the basic shipping/receiving system.
+
+#BEGINLEGEND
+{"key":"W", "value":[{"type":"wall",  		"properties": { "y": 0.50 }}]}
+{"key":"F", "value":[{"type":"floor", 		"properties": { "y": 0.00 }}]}
+{"key":"S", "value":[{"type":"shelf", 		"properties": { "y": 1.15 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"R", "value":[{"type":"robot", 		"properties": { "y": 0.15 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"X", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"danger_area" }}]}
+{"key":"0", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"shipping" }}]}
+{"key":"1", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"receiving" }}]}
+#ENDLEGEND
+
+
+#BEGINPROPERTIES
+{
+	"shipping_area":  { "begin": { "x": 1.0, "y": 0.0 }, "end": { "x": 6.0,  "y": 5.0 } },
+	"receiving_area": { "begin": { "x": 7.0, "y": 0.0 }, "end": { "x": 12.0, "y": 5.0 } }
+}
+#ENDPROPERTIES
+
+
+#BEGINLAYOUT
+WXXXXXWXXXXXWWWWWWWWWWWW
+WXXXXXWXXXXXWSSSSSSSSSSW
+WXX0XXWXX1XXWFFFFFFFFFFW
+WXXXXXWXXXXXWFSSSSSSSSSW
+WXXXXXWXXXXXWFFFFFFFFFFW
+WFFRFFFFFRFFFFFFFFFFSSSW
+WFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSW
+WFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSW
+WFFFFFFFFFFFFFFFFFFFFFFW
+WSSSSSSSSSSSSSSSSSSSSSSW
+WWWWWWWWWWWWWWWWWWWWWWWW
+#ENDLAYOUT
