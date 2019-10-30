@@ -26,7 +26,7 @@ import java.io.IOException;
 public class App extends SpringBootServletInitializer implements WebSocketConfigurer {
     public static final String WORLD_PATH = new File("src/main/resources/layout/layout_04.worlddef").getAbsolutePath();
 
-    public static Controller Controller;
+    public static Controller Controller = null;
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }

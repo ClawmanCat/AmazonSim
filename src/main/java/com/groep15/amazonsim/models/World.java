@@ -2,11 +2,9 @@ package com.groep15.amazonsim.models;
 
 import com.groep15.amazonsim.ai.IWorldActor;
 import com.groep15.amazonsim.base.App;
-import com.groep15.amazonsim.utility.Square2i;
 import com.groep15.amazonsim.utility.Vec2i;
 import com.groep15.amazonsim.utility.WorldGraph;
 import com.groep15.amazonsim.wms.ObjectTracker;
-import com.groep15.amazonsim.wms.ShippingReceivingManager;
 import com.groep15.amazonsim.wms.WarehouseItemFactory;
 import org.json.simple.JSONObject;
 
@@ -23,7 +21,6 @@ public class World implements Model {
     private int w, h;
     private WorldGraph graph;
     private JSONObject settings;
-    private ShippingReceivingManager srManager;
     private ObjectTracker tracker;
     private WarehouseItemFactory factory;
 
@@ -49,26 +46,6 @@ public class World implements Model {
                         .map(x -> (Shelf) x)
                         .collect(Collectors.toList())
         );
-
-        this.srManager = new ShippingReceivingManager(
-                this,
-                tracker,
-                factory,
-                this.worldObjects.stream()
-                        .filter(x -> x instanceof Robot)
-                        .map(x -> (Robot) x)
-                        .collect(Collectors.toList()),
-                new Square2i(
-                        new Vec2i((Double) getSetting("shipping_area.begin.x"), (Double) getSetting("shipping_area.begin.y")),
-                        new Vec2i((Double) getSetting("shipping_area.end.x"),   (Double) getSetting("shipping_area.end.y"))
-                ),
-                new Square2i(
-                        new Vec2i((Double) getSetting("receiving_area.begin.x"), (Double) getSetting("receiving_area.begin.y")),
-                        new Vec2i((Double) getSetting("receiving_area.end.x"),   (Double) getSetting("receiving_area.end.y"))
-                )
-        );
-
-        //this.srManager.generateReceiveRequests(20);
     }
 
 
@@ -89,17 +66,9 @@ public class World implements Model {
 
     @Override
     public void update() {
-        if (!App.Controller.hasViews()) return;
+        if (App.Controller != null && !App.Controller.hasViews()) return;
 
         if (tick == 0) postInit();
-
-        if (tick % 1000 == 0 && tick > 0) {
-            // Add new orders every 1000 ticks
-            //srManager.generateReceiveRequests(5);
-            //srManager.generateDeliveryRequests(5);
-        }
-
-        srManager.update();
 
         for (Object3D object : this.worldObjects) {
             if (object.update()) {
@@ -159,6 +128,11 @@ public class World implements Model {
 
 
     public WorldGraph getWorldGraph() { return this.graph; }
+
+
+    public ObjectTracker getTracker() {
+        return tracker;
+    }
 
 
     public List<IWorldActor> getActors() {
