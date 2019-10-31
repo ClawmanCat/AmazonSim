@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 // Generate item shipping and receiving requests for the robots to complete.
 public class ShippingReceivingManager {
     public static final int SHELF_ITEM_CAPACITY     = 10;
-    public static final int TIME_TO_TRANSFER_ITEM   = 30;
+    public static final int TIME_TO_TRANSFER_ITEM   = 10;
 
     private Random random = new Random();
 
@@ -70,9 +70,9 @@ public class ShippingReceivingManager {
                 if (where == null) return; else ++deliveryCount;
 
                 Pair<Shelf, List<WarehouseItem>> delivery = Utility.Find(pendingDeliveries, x -> standing.contains(x.getValue0()));
-                Robot robot = free.remove(0);
+                Robot robot = GetRemoveClosestRobot(free, new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().z));
 
-                Vec2i current = new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().y);
+                Vec2i current = new Vec2i(robot.getPosition().x, robot.getPosition().z);
                 robot.setAction(new ActionCompound(
                         new ActionTransportObject(robot, delivery.getValue0(), current, where),
                         new ActionRunCommand(
@@ -84,7 +84,7 @@ public class ShippingReceivingManager {
                                 },
                                 TIME_TO_TRANSFER_ITEM * delivery.getValue1().size()
                         ),
-                        new ActionTransportObject(robot, delivery.getValue0(), where, current),
+                        new ActionTransportObject(robot, delivery.getValue0(), where, where, current),
                         new ActionRunCommand(() -> {
                             Utility.Move(delivery.getValue0(), taken, standing);
                             Utility.Move(robot, busy, free);
@@ -101,15 +101,15 @@ public class ShippingReceivingManager {
                 Vec2i where = GetNextShelfPoint(receiveArea, receiveCount);
                 if (where == null) return; else ++receiveCount;
 
-                List<WarehouseItem> receive = pendingReceives.get(0);
-                Robot robot  = free.remove(0);
-                Shelf shelf  = Utility.Find(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY);
-                int movecnt  = Math.min(receive.size(), SHELF_ITEM_CAPACITY - shelf.getItemCount());
-                boolean done = movecnt == receive.size();
-                Vec2i old    = new Vec2i(shelf.getPosition().x, shelf.getPosition().z);
+                List<WarehouseItem> receive = pendingReceives.remove(0);
+                Shelf shelf    = Utility.Find(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY);
+                Robot robot    = GetRemoveClosestRobot(free, new Vec2i(shelf.getPosition().x, shelf.getPosition().z));
+                int movecnt    = Math.min(receive.size(), SHELF_ITEM_CAPACITY - shelf.getItemCount());
+                Vec2i oldpos   = new Vec2i(robot.getPosition().x, robot.getPosition().z);
+                Vec2i shelfpos = new Vec2i(shelf.getPosition().x, shelf.getPosition().z);
 
                 robot.setAction(new ActionCompound(
-                        new ActionTransportObject(robot, shelf, old, where),
+                        new ActionTransportObject(robot, shelf, oldpos, where),
                         new ActionRunCommand(
                                 () -> {
                                     for (int i = 0; i < movecnt; ++i) {
@@ -122,16 +122,17 @@ public class ShippingReceivingManager {
                                 },
                                 TIME_TO_TRANSFER_ITEM * movecnt
                         ),
-                        new ActionTransportObject(robot, shelf, where, old),
+                        new ActionTransportObject(robot, shelf, where, where, shelfpos),
                         new ActionRunCommand(() -> {
                             Utility.Move(robot, busy, free);
                             Utility.Move(shelf, taken, standing);
+
+                            if (receive.size() > 0) pendingReceives.add(receive);
                         })
                 ));
 
                 Utility.Move(shelf, standing, taken);
                 this.busy.add(robot);
-                if (done) pendingReceives.remove(0);
             }
         }
     }
@@ -140,7 +141,10 @@ public class ShippingReceivingManager {
     // Receive new objects into the warehouse.
     public void receiveObjects(int count) {
         List<WarehouseItem> items = WarehouseItemFactory.instance.create(count);
-        pendingReceives.add(items);
+
+        for (int i = 0; i < items.size(); i+= SHELF_ITEM_CAPACITY) {
+            pendingReceives.add(new ArrayList<>(items.subList(i, i + Math.min(SHELF_ITEM_CAPACITY, items.size() - i))));
+        }
     }
 
 
@@ -189,5 +193,26 @@ public class ShippingReceivingManager {
         if (current >= distance) return null;
 
         return new Vec2i(area.a.x + current, area.b.y - 1);
+    }
+
+
+    private static Robot GetRemoveClosestRobot(List<Robot> robots, Vec2i where) {
+        Robot current = null;
+        double currentDist = Double.POSITIVE_INFINITY;
+
+        for (Robot r : robots) {
+            double dx = Math.abs(r.getPosition().x - where.x);
+            double dy = Math.abs(r.getPosition().z - where.y);
+
+            double d = Math.sqrt((dx * dx) - (dy * dy));
+
+            if (d < currentDist) {
+                currentDist = d;
+                current = r;
+            }
+        }
+
+        robots.remove(current);
+        return current;
     }
 }

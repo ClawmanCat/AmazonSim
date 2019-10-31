@@ -22,15 +22,18 @@ public class SimulationController extends Controller {
     @Override
     public void run() {
         while (true) {
+            if (!hasViews()) continue;
+
             this.getModel().update();
 
             if (((World) this.getModel()).getTickCount() % 1000 == 0) {
-                this.manager.receiveObjects(16);
+                System.out.println("Generating receive requests @ t = " + ((World) this.getModel()).getTickCount());
+                this.manager.receiveObjects(32);
             }
 
             this.manager.update();
             try {
-                Thread.sleep(1000 / 30);
+                Thread.sleep((long) (1000.0 / 30.0));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

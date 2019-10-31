@@ -35,7 +35,7 @@ public class ActionRunCommand implements IWorldAction {
 
     @Override
     public boolean isDone() {
-        return duration > 0;
+        return duration == 0;
     }
 
     @Override

@@ -11,18 +11,20 @@ public class ActionTransportObject implements IWorldAction {
     private Vec2i dest;
     private ActionCompound actions;
 
-    public ActionTransportObject(IWorldActor actor, Object3D target, Vec2i src, Vec2i dest) {
+    public ActionTransportObject(IWorldActor actor, Object3D target, Vec2i apos, Vec2i spos, Vec2i dest) {
         this.target = target;
         this.dest = dest;
 
-        Vec2i obpos = new Vec2i(target.getPosition().x, target.getPosition().z);
-
         this.actions = new ActionCompound(
-                new ActionGoto(actor, src, obpos),
+                new ActionGoto(actor, apos, spos),
                 new ActionPickup(target),
-                new ActionGoto(actor, obpos, dest),
+                new ActionGoto(actor, spos, dest),
                 new ActionRelease()
         );
+    }
+
+    public ActionTransportObject(IWorldActor actor, Object3D target, Vec2i apos, Vec2i dest) {
+        this(actor, target, apos, new Vec2i(target.getPosition().x, target.getPosition().z), dest);
     }
 
     @Override

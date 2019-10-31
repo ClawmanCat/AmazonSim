@@ -1,6 +1,5 @@
 package com.groep15.amazonsim.models;
 
-import com.groep15.amazonsim.base.App;
 import com.groep15.amazonsim.models.ai.IWorldActor;
 import com.groep15.amazonsim.utility.Vec2i;
 import com.groep15.amazonsim.utility.WorldGraph;
@@ -49,9 +48,6 @@ public class World implements Model {
 
     @Override
     public void update() {
-        // Don't update if there's no-one looking.
-        if (App.Controller != null && !App.Controller.hasViews()) return;
-
         for (Object3D object : this.worldObjects) {
             if (object.update()) {
                 pcs.firePropertyChange(Model.UPDATE_COMMAND, null, new ProxyObject3D(object));

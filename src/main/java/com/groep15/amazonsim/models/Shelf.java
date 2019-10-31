@@ -1,8 +1,6 @@
 package com.groep15.amazonsim.models;
 
 import com.groep15.amazonsim.controllers.wms.WarehouseItem;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ public class Shelf extends Object3D {
         this.sy = 1.15;
     }
 
-    @Override
+    /*@Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
         json.put("itemCount", items.size());
@@ -27,7 +25,7 @@ public class Shelf extends Object3D {
         json.put("items", itemJSON);
 
         return json;
-    }
+    }*/
 
     @Override
     public boolean update() {
