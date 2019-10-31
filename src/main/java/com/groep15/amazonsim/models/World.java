@@ -1,8 +1,9 @@
 package com.groep15.amazonsim.models;
 
 import com.groep15.amazonsim.models.ai.IWorldActor;
+import com.groep15.amazonsim.models.worldobject.Object3D;
+import com.groep15.amazonsim.models.worldobject.ProxyObject3D;
 import com.groep15.amazonsim.utility.Vec2i;
-import com.groep15.amazonsim.utility.WorldGraph;
 import org.json.simple.JSONObject;
 
 import java.beans.PropertyChangeListener;

@@ -1,11 +1,11 @@
 package com.groep15.amazonsim.controllers.wms;
 
-import com.groep15.amazonsim.models.Robot;
-import com.groep15.amazonsim.models.Shelf;
 import com.groep15.amazonsim.models.World;
 import com.groep15.amazonsim.models.ai.ActionCompound;
 import com.groep15.amazonsim.models.ai.ActionRunCommand;
 import com.groep15.amazonsim.models.ai.ActionTransportObject;
+import com.groep15.amazonsim.models.worldobject.Robot;
+import com.groep15.amazonsim.models.worldobject.Shelf;
 import com.groep15.amazonsim.utility.Square2i;
 import com.groep15.amazonsim.utility.Utility;
 import com.groep15.amazonsim.utility.Vec2i;
@@ -28,7 +28,7 @@ public class ShippingReceivingManager {
     private List<Shelf> standing, taken;
 
     private Square2i receiveArea, deliveryArea;
-    private int receiveCount, deliveryCount;
+    private List<Vec2i> receivePoints, deliveryPoints;
 
     private List<List<WarehouseItem>> pendingReceives;
     private List<Pair<Shelf, List<WarehouseItem>>> pendingDeliveries;
@@ -52,9 +52,10 @@ public class ShippingReceivingManager {
         this.items    = new ArrayList<>();
         this.taken    = new ArrayList<>();
 
-        this.receiveArea  = GetWorldArea(world, "receiving");
-        this.deliveryArea = GetWorldArea(world, "shipping");
-        this.receiveCount = this.deliveryCount = 0;
+        this.receiveArea    = GetWorldArea(world, "receiving");
+        this.deliveryArea   = GetWorldArea(world, "shipping");
+        this.receivePoints  = GetValidShelfPoints(this.receiveArea);
+        this.deliveryPoints = GetValidShelfPoints(this.deliveryArea);
 
         this.pendingReceives   = new ArrayList<>();
         this.pendingDeliveries = new ArrayList<>();
@@ -63,11 +64,11 @@ public class ShippingReceivingManager {
 
     public void update() {
         // Since we only process one order per tick, process deliveries on even ticks and receives on uneven ones.
-        if ((world.getTickCount() & 1) == 0) {
+        if (world.getTickCount() % 2 == 0) {
             if (!free.isEmpty() && Utility.Contains(pendingDeliveries, x -> standing.contains(x.getValue0()))) {
                 // Get next point where we can deliver.
-                Vec2i where = GetNextShelfPoint(deliveryArea, deliveryCount);
-                if (where == null) return; else ++deliveryCount;
+                if (deliveryPoints.isEmpty()) return;
+                Vec2i where = deliveryPoints.remove(0);
 
                 Pair<Shelf, List<WarehouseItem>> delivery = Utility.Find(pendingDeliveries, x -> standing.contains(x.getValue0()));
                 Robot robot = GetRemoveClosestRobot(free, new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().z));
@@ -88,6 +89,8 @@ public class ShippingReceivingManager {
                         new ActionRunCommand(() -> {
                             Utility.Move(delivery.getValue0(), taken, standing);
                             Utility.Move(robot, busy, free);
+
+                            this.deliveryPoints.add(where);
                         })
                 ));
 
@@ -98,11 +101,11 @@ public class ShippingReceivingManager {
         } else {
             if (!free.isEmpty() && !pendingReceives.isEmpty() && Utility.Contains(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY)) {
                 // Get next point where we can receive.
-                Vec2i where = GetNextShelfPoint(receiveArea, receiveCount);
-                if (where == null) return; else ++receiveCount;
+                if (receivePoints.isEmpty()) return;
+                Vec2i where = receivePoints.remove(0);
 
                 List<WarehouseItem> receive = pendingReceives.remove(0);
-                Shelf shelf    = Utility.Find(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY);
+                Shelf shelf    = Utility.FindRandom(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY);
                 Robot robot    = GetRemoveClosestRobot(free, new Vec2i(shelf.getPosition().x, shelf.getPosition().z));
                 int movecnt    = Math.min(receive.size(), SHELF_ITEM_CAPACITY - shelf.getItemCount());
                 Vec2i oldpos   = new Vec2i(robot.getPosition().x, robot.getPosition().z);
@@ -126,6 +129,8 @@ public class ShippingReceivingManager {
                         new ActionRunCommand(() -> {
                             Utility.Move(robot, busy, free);
                             Utility.Move(shelf, taken, standing);
+
+                            this.receivePoints.add(where);
 
                             if (receive.size() > 0) pendingReceives.add(receive);
                         })
@@ -188,11 +193,11 @@ public class ShippingReceivingManager {
     }
 
 
-    private static Vec2i GetNextShelfPoint(Square2i area, int current) {
-        int distance = area.b.x - area.a.x;
-        if (current >= distance) return null;
+    private List<Vec2i> GetValidShelfPoints(Square2i area) {
+        List<Vec2i> result = new ArrayList<>();
+        for (int x = area.a.x; x < area.b.x; ++x) result.add(new Vec2i(x, area.b.y - 1));
 
-        return new Vec2i(area.a.x + current, area.b.y - 1);
+        return result;
     }
 
 
@@ -204,7 +209,7 @@ public class ShippingReceivingManager {
             double dx = Math.abs(r.getPosition().x - where.x);
             double dy = Math.abs(r.getPosition().z - where.y);
 
-            double d = Math.sqrt((dx * dx) - (dy * dy));
+            double d = Math.sqrt((dx * dx) + (dy * dy));
 
             if (d < currentDist) {
                 currentDist = d;

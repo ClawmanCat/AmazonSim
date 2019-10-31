@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.models;
+package com.groep15.amazonsim.models.worldobject;
 
 /*
  * Deze interface beschrijft wat een onderdeel van het model moet kunnen om deze
@@ -7,6 +7,6 @@ package com.groep15.amazonsim.models;
  * interface implementeerd. Als dat zo is, wordt het object geupdate wanneer de
  * wereld update.
  */
-interface Updatable {
+public interface Updatable {
     boolean update();
 }

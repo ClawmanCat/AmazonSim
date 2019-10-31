@@ -1,7 +1,7 @@
-package com.groep15.amazonsim.utility;
+package com.groep15.amazonsim.models;
 
-import com.groep15.amazonsim.models.Object3D;
-import com.groep15.amazonsim.models.World;
+import com.groep15.amazonsim.models.worldobject.Object3D;
+import com.groep15.amazonsim.models.worldobject.Object3DFactory;
 import org.javatuples.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

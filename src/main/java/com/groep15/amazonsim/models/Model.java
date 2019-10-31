@@ -1,5 +1,7 @@
 package com.groep15.amazonsim.models;
 
+import com.groep15.amazonsim.models.worldobject.Object3D;
+
 import java.beans.PropertyChangeListener;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.groep15.amazonsim.models.ai;
 
-import com.groep15.amazonsim.models.Object3D;
+import com.groep15.amazonsim.models.worldobject.Object3D;
 import com.groep15.amazonsim.utility.Direction;
 import com.groep15.amazonsim.utility.Vec2i;
 
@@ -43,7 +43,7 @@ public class ActionTransportObject implements IWorldAction {
     }
 
     @Override
-    public void onWorldChanged() {
-        this.actions.onWorldChanged();
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) {
+        this.actions.onWorldChanged(doNotDisturb);
     }
 }

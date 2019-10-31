@@ -4,7 +4,7 @@ import com.groep15.amazonsim.base.Command;
 import com.groep15.amazonsim.utility.Direction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 // Wrapper around command to run it as an action.
@@ -40,9 +40,11 @@ public class ActionRunCommand implements IWorldAction {
 
     @Override
     public List<Direction> getMovementFuture() {
-        return this.isDone() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(Direction.NONE));
+        return this.isDone()
+                ? new ArrayList<>()
+                : Collections.nCopies(duration, Direction.NONE);
     }
 
     @Override
-    public void onWorldChanged() { }
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) { }
 }

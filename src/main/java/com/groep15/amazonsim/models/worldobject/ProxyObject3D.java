@@ -1,8 +1,7 @@
-package com.groep15.amazonsim.models;
+package com.groep15.amazonsim.models.worldobject;
 
 import com.groep15.amazonsim.utility.Vec3d;
 import org.json.simple.JSONObject;
-import java.lang.UnsupportedOperationException;
 
 import java.util.UUID;
 

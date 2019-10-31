@@ -1,6 +1,7 @@
-package com.groep15.amazonsim.models;
+package com.groep15.amazonsim.models.worldobject;
 
 import com.groep15.amazonsim.controllers.wms.WarehouseItem;
+import com.groep15.amazonsim.models.World;
 
 import java.util.ArrayList;
 import java.util.List;

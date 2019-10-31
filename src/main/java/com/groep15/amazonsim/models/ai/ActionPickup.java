@@ -1,6 +1,6 @@
 package com.groep15.amazonsim.models.ai;
 
-import com.groep15.amazonsim.models.Object3D;
+import com.groep15.amazonsim.models.worldobject.Object3D;
 import com.groep15.amazonsim.utility.Direction;
 
 import java.util.ArrayList;
@@ -35,5 +35,5 @@ public class ActionPickup implements IWorldAction {
     }
 
     @Override
-    public void onWorldChanged() { }
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) { }
 }

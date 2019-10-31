@@ -1,6 +1,5 @@
-package com.groep15.amazonsim.utility;
+package com.groep15.amazonsim.models.worldobject;
 
-import com.groep15.amazonsim.models.Object3D;
 import org.json.simple.JSONObject;
 import org.reflections.Reflections;
 

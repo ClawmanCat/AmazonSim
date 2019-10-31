@@ -24,7 +24,8 @@ public class ActionGoto implements IWorldAction {
         if (isDone()) return false;
 
         // If we don't have a path, try and get a new one.
-        if (path == null) onWorldChanged();
+        if (path == null) onWorldChanged(new ArrayList<>());
+        if (path == null || path.size() == 0) return true;  // Still no path...
 
         if (mover == null || mover.isDone()) mover = new ActionMove(path.remove(0));
         return mover.progress(obj);
@@ -41,10 +42,21 @@ public class ActionGoto implements IWorldAction {
     }
 
     @Override
-    public void onWorldChanged() {
-        if (this.isDone()) return;
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) {
+        if (this.isDone() || doNotDisturb.contains(actor)) return;
 
         Vec2i src = new Vec2i(actor.getPosition().x, actor.getPosition().z);
-        this.path = actor.getWorld().getWorldGraph().calculatePath(actor, src, dest);
+
+        // Try to get a path that doesn't overlap anyone else's path.
+        this.path = actor.getWorld().getWorldGraph().calculatePath(actor, src, dest, true);
+        if (path != null) return;
+
+        // If no such path exists, take one that overlaps another's path, and wait until its clear.
+        this.path = actor.getWorld().getWorldGraph().calculatePath(actor, src, dest, false);
+
+        if (actor.getWorld().getWorldGraph().collides(this.actor, src, this.path)) {
+            this.path = null;   // Can't move yet, just wait.
+            return;
+        }
     }
 }

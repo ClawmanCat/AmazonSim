@@ -1,7 +1,7 @@
 package com.groep15.amazonsim.models.ai;
 
-import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
+import com.groep15.amazonsim.models.worldobject.Object3D;
 import com.groep15.amazonsim.utility.Vec3d;
 
 public interface IWorldActor {

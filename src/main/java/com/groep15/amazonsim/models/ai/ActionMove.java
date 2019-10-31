@@ -53,5 +53,5 @@ public class ActionMove implements IWorldAction {
     }
 
     @Override
-    public void onWorldChanged() { }
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) { }
 }

@@ -2,8 +2,8 @@ package com.groep15.amazonsim.controllers;
 
 import com.groep15.amazonsim.controllers.wms.ShippingReceivingManager;
 import com.groep15.amazonsim.models.Model;
-import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
+import com.groep15.amazonsim.models.worldobject.Object3D;
 import com.groep15.amazonsim.views.View;
 
 import java.beans.PropertyChangeEvent;
@@ -25,8 +25,9 @@ public class SimulationController extends Controller {
             if (!hasViews()) continue;
 
             this.getModel().update();
+            int tick = ((World) this.getModel()).getTickCount();
 
-            if (((World) this.getModel()).getTickCount() % 1000 == 0) {
+            if (tick % 1000 == 0 || tick == 100) {
                 System.out.println("Generating receive requests @ t = " + ((World) this.getModel()).getTickCount());
                 this.manager.receiveObjects(32);
             }

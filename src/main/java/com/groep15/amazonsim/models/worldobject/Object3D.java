@@ -1,5 +1,6 @@
-package com.groep15.amazonsim.models;
+package com.groep15.amazonsim.models.worldobject;
 
+import com.groep15.amazonsim.models.World;
 import com.groep15.amazonsim.utility.JSONAble;
 import com.groep15.amazonsim.utility.Vec3d;
 import org.json.simple.JSONObject;
@@ -15,7 +16,7 @@ public abstract class Object3D implements Updatable, JSONAble {
     protected boolean passable;
     public boolean dirty = false;
 
-    Object3D(World world) {
+    public Object3D(World world) {
         this.world = world;
 
         this.x  = this.y  = this.z  = 0.0;

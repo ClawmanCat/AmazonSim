@@ -1,5 +1,6 @@
-package com.groep15.amazonsim.models;
+package com.groep15.amazonsim.models.worldobject;
 
+import com.groep15.amazonsim.models.World;
 import org.json.simple.JSONObject;
 
 public class TestObject extends Object3D {

@@ -2,7 +2,9 @@ package com.groep15.amazonsim.utility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class Utility {
     private Utility() {}
@@ -36,6 +38,15 @@ public final class Utility {
     public static <T> T Find(List<T> list, Predicate<T> checker) {
         for (T elem : list) if (checker.test(elem)) return elem;
         return null;
+    }
+
+    public static <T> T FindRandom(List<T> list, Predicate<T> checker) {
+        List<T> valid = list.stream()
+                .filter(checker)
+                .collect(Collectors.toList());
+
+        Random r = new Random();
+        return valid.get(r.nextInt(valid.size() - 1));
     }
 
     public static <T> void Move(T elem, List<T> from, List<T> to) {

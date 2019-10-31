@@ -9,5 +9,5 @@ public interface IWorldAction {
     boolean isDone();
 
     List<Direction> getMovementFuture();
-    void onWorldChanged();
+    void onWorldChanged(List<IWorldActor> doNotDisturb);
 }

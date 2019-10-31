@@ -39,7 +39,7 @@ public class ActionCompound implements IWorldAction {
     }
 
     @Override
-    public void onWorldChanged() {
-        for (IWorldAction action : actions) action.onWorldChanged();
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) {
+        for (IWorldAction action : actions) action.onWorldChanged(doNotDisturb);
     }
 }

@@ -1,13 +1,13 @@
 package com.groep15.amazonsim.tests;
 
-import com.groep15.amazonsim.models.Object3D;
-import com.groep15.amazonsim.models.Shelf;
 import com.groep15.amazonsim.models.World;
+import com.groep15.amazonsim.models.WorldReader;
 import com.groep15.amazonsim.models.ai.ActionTransportObject;
 import com.groep15.amazonsim.models.ai.IWorldActor;
+import com.groep15.amazonsim.models.worldobject.Object3D;
+import com.groep15.amazonsim.models.worldobject.Shelf;
 import com.groep15.amazonsim.utility.Square2i;
 import com.groep15.amazonsim.utility.Vec2i;
-import com.groep15.amazonsim.utility.WorldReader;
 
 import java.io.File;
 import java.util.ArrayList;

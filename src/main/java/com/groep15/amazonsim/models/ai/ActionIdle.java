@@ -30,5 +30,5 @@ public class ActionIdle implements IWorldAction {
     }
 
     @Override
-    public void onWorldChanged() { }
+    public void onWorldChanged(List<IWorldActor> doNotDisturb) { }
 }

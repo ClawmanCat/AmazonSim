@@ -1,5 +1,6 @@
-package com.groep15.amazonsim.models;
+package com.groep15.amazonsim.models.worldobject;
 
+import com.groep15.amazonsim.models.World;
 import com.groep15.amazonsim.models.ai.ActionIdle;
 import com.groep15.amazonsim.models.ai.IWorldAction;
 import com.groep15.amazonsim.models.ai.IWorldActor;
