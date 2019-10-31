@@ -14,7 +14,7 @@ public class Shelf extends Object3D {
     public Shelf(World world) {
         super(world);
 
-        this.sy = 1.15;
+        this.sy = (2.4375 / 2.0);
     }
 
     @Override

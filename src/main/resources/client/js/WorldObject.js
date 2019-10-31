@@ -10,8 +10,8 @@ class WorldObjectFactory extends ISocketUpdatableFactory {
 
         switch (json.parameters.type) {
             case "robot":           result = new Robot(this, json);             break;
-            case "ambient_light":   result = new AmbientLight(this, json);      break;
             case "floor":           result = new Floor(this, json);             break;
+            case "wall":            result = new Wall(this, json);              break;
             case "shelf":           result = new Shelf(this, json);             break;
             default:                result = new Unknown(this, json);           break;
         }
@@ -84,12 +84,12 @@ class IWorldObject extends ISocketUpdatable {
 class Robot extends IWorldObject {
     static Geometry  = new THREE.BoxGeometry(0.9, 0.3, 0.9);
     static Materials = [
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/robot_side.png" ),  side: THREE.DoubleSide }), //RIGHT
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/robot_side.png" ),  side: THREE.DoubleSide }), //LEFT
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/robot_top.png"  ),  side: THREE.DoubleSide }), //TOP
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/robot_bottom.png"), side: THREE.DoubleSide }), //BOTTOM
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/robot_front.png" ), side: THREE.DoubleSide }), //FRONT
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/robot_front.png" ), side: THREE.DoubleSide })  //BACK
+        Utility.LoadTextureOrDefault("robot_side"  ), //RIGHT
+        Utility.LoadTextureOrDefault("robot_side"  ), //LEFT
+        Utility.LoadTextureOrDefault("robot_top"   ), //TOP
+        Utility.LoadTextureOrDefault("robot_bottom"), //BOTTOM
+        Utility.LoadTextureOrDefault("robot_front" ), //FRONT
+        Utility.LoadTextureOrDefault("robot_front" )  //BACK
     ];
 
     makeMesh() {
@@ -99,48 +99,58 @@ class Robot extends IWorldObject {
 
 
 class Shelf extends IWorldObject {
-    static Geometry  = new THREE.BoxGeometry(1, 2.3, 1);
-    static Materials = [
-        Utility.LoadTextureOrDefault("shelf_side"  ), //RIGHT
-        Utility.LoadTextureOrDefault("shelf_side"  ), //LEFT
-        Utility.LoadTextureOrDefault("shelf_top"   ), //TOP
-        Utility.LoadTextureOrDefault("shelf_bottom"), //BOTTOM
-        Utility.LoadTextureOrDefault("shelf_side"  ), //FRONT
-        Utility.LoadTextureOrDefault("shelf_side"  )  //BACK
+    static ShelfGeometry  = new THREE.BoxGeometry(0.99, 78.0 / 32.0, 0.99);
+    static ShelfMaterials = [
+        Utility.LoadTextureOrDefault("shelf_side",   null, false, true), //RIGHT
+        Utility.LoadTextureOrDefault("shelf_side",   null, false, true), //LEFT
+        Utility.LoadTextureOrDefault("shelf_top",    null, false, true), //TOP
+        Utility.LoadTextureOrDefault("shelf_bottom", null, false, true), //BOTTOM
+        Utility.LoadTextureOrDefault("shelf_side",   null, false, true), //FRONT
+        Utility.LoadTextureOrDefault("shelf_side",   null, false, true)
     ];
 
+    static FloorGeometry  = new THREE.PlaneGeometry(0.99, 0.99);
+    static FloorMaterials = Utility.LoadTextureOrDefault("shelf_inside");
+
     makeMesh() {
-        return new THREE.Mesh(Shelf.Geometry, Shelf.Materials);
+        let group = new THREE.Group();
+
+        group.add(new THREE.Mesh(Shelf.ShelfGeometry, Shelf.ShelfMaterials));
+
+        for (let i = 0; i < 5; ++i) {
+            let h = ((11.0 + (13.0 * i)) / 32.0) - (78.0 / 32.0 / 2.0);
+
+            let floor = new THREE.Mesh(Shelf.FloorGeometry, Shelf.FloorMaterials);
+            floor.position.set(0, h, 0);
+            floor.rotation.set(Math.PI / 2.0, 0, 0);
+
+            group.add(floor);
+        }
+
+        return group;
     }
 }
 
 
-class AmbientLight extends IWorldObject {
-    constructor (world, json) {
-        super(world, json);
-    }
-
-    update(json) {
-        this.intensity = json.parameters.intensity;
-        this.color = json.parameters.color;
-
-        super.update(json);
-    }
-
+class Wall extends IWorldObject {
+    static Geometry  = new THREE.BoxGeometry(1, 4, 1);
+    static Materials = [
+        Utility.LoadTextureOrDefault("wall_side"  ), //RIGHT
+        Utility.LoadTextureOrDefault("wall_side"  ), //LEFT
+        Utility.LoadTextureOrDefault("wall_top"   ), //TOP
+        Utility.LoadTextureOrDefault("wall_top"   ), //BOTTOM
+        Utility.LoadTextureOrDefault("wall_side"  ), //FRONT
+        Utility.LoadTextureOrDefault("wall_side"  )  //BACK
+    ];
+    
     makeMesh() {
-        let light = new THREE.AmbientLight(this.color);
-        light.intensity = this.intensity;
-
-        return light;
+        return new THREE.Mesh(Wall.Geometry, Wall.Materials);
     }
-
-    setPosition(position) {}
-    setRotation(rotation) {}
 }
 
 
 class Floor extends IWorldObject {
-    static Materials = new THREE.MeshBasicMaterial({ color: 0x424242, side: THREE.DoubleSide });
+    static Materials = Utility.LoadTextureOrDefault("floor");
 
     constructor (world, json) {
         super(world, json);
@@ -167,7 +177,7 @@ class Floor extends IWorldObject {
 
 class Unknown extends IWorldObject {
     static Geometry  = new THREE.BoxGeometry(1.0, 1.0, 1.0);
-    static Materials = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/unknown_item.png" ),  side: THREE.DoubleSide });
+    static Materials = Utility.LoadTextureOrDefault("unknown_item");
 
     constructor(world, json) {
         super(world, json);
