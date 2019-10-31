@@ -1,8 +1,8 @@
 package com.groep15.amazonsim.utility;
 
-import com.groep15.amazonsim.ai.IWorldActor;
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
+import com.groep15.amazonsim.models.ai.IWorldActor;
 
 import java.util.*;
 
@@ -22,16 +22,13 @@ public class WorldGraph {
 
         boolean[][] old = map;
         this.map = new boolean[world.getSize().x][world.getSize().y];
-
         for (boolean[] arr : this.map) Arrays.fill(arr, true);
 
         boolean changed = false;
         for (Object3D o : world.getWorldObjectsModifyiable()) {
-            if (o.getIsPassable()) continue;
-
             Vec2i pos = new Vec2i(Math.round(o.getPosition().x), Math.round(o.getPosition().z));
 
-            // Bounds check
+            if (o.getIsPassable())                                          continue;
             if (pos.x >= world.getSize().x || pos.y >= world.getSize().y)   continue;
             if (pos.x < 0 || pos.y < 0)                                     continue;
 
@@ -40,6 +37,7 @@ public class WorldGraph {
             for (IWorldActor actor : actors) if (actor.getHeldObject() == o) { carried = true; break; }
             if (carried) continue;
 
+            // Update map
             map[pos.x][pos.y] = false;
             if (old != null && old[pos.x][pos.y] != map[pos.x][pos.y]) changed = true;
         }
@@ -49,7 +47,7 @@ public class WorldGraph {
 
 
     // Find the shortest path through BFS.
-    public List<Direction> calculatePath(IWorldActor actor, Vec2i from, Vec2i to, int startDelay) {
+    public List<Direction> calculatePath(IWorldActor actor, Vec2i from, Vec2i to) {
         if (map == null) update();
 
         Map<Vec2i, Direction> parents = new HashMap<>();
@@ -61,22 +59,7 @@ public class WorldGraph {
         while (queue.size() > 0) {
             Vec2i pos = queue.remove();
 
-            // Retrace path if at destination.
-            if (pos.equals(to)) {
-                List<Direction> path = new ArrayList<>();
-
-                Vec2i next = pos;
-                while (!next.equals(from)) {
-                    Direction d = parents.get(next);
-
-                    path.add(d.invert());
-                    next = new Vec2i(next.x + d.movement.x, next.y + d.movement.y);
-                }
-
-                Collections.reverse(path);
-
-                return path;
-            }
+            if (pos.equals(to)) return RetracePath(pos, from, parents);
 
             for (Direction d : Direction.values()) {
                 Vec2i next = new Vec2i(pos.x + d.movement.x, pos.y + d.movement.y);
@@ -95,36 +78,19 @@ public class WorldGraph {
     }
 
 
-    // Will the given path collide with anyone in the future?
-    public boolean willCollide(IWorldActor actor, Vec2i start, List<Direction> path) {
-        Map<Vec2i, List<Integer>> occupations = new HashMap<>();
+    private static List<Direction> RetracePath(Vec2i pos, Vec2i from, Map<Vec2i, Direction> parents) {
+        List<Direction> path = new ArrayList<>();
 
-        for (IWorldActor a : this.actors) {
-            if (a == actor) continue;
+        Vec2i next = pos;
+        while (!next.equals(from)) {
+            Direction d = parents.get(next);
 
-            List<Vec2i> positions = Utility.DirectionsToPositions(
-                    a.getAction().getMovementFuture(),
-                    new Vec2i(a.getPosition().x, a.getPosition().z)
-            );
-
-            for (int i = 0; i < positions.size(); ++i) {
-                Vec2i pos = positions.get(i);
-
-                // Occupy in the ticks before and after as well, to prevent collisions when moving in / out.
-                for (int dt = -2; dt <= 2; ++dt) {
-                    if (occupations.containsKey(pos)) occupations.get(pos).add(i + dt);
-                    else occupations.put(pos, new ArrayList<>(Arrays.asList(i + dt)));
-                }
-            }
+            path.add(d.invert());
+            next = new Vec2i(next.x + d.movement.x, next.y + d.movement.y);
         }
 
-        List<Vec2i> positions = Utility.DirectionsToPositions(path, start);
-        for (int i = 0; i < positions.size(); ++i) {
-            Vec2i pos = positions.get(i);
+        Collections.reverse(path);
 
-            if (occupations.containsKey(pos) && occupations.get(pos).contains(i)) return true;
-        }
-
-        return false;
+        return path;
     }
 }

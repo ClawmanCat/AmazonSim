@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.ai;
+package com.groep15.amazonsim.models.ai;
 
 import com.groep15.amazonsim.utility.Direction;
 
@@ -9,7 +9,5 @@ public interface IWorldAction {
     boolean isDone();
 
     List<Direction> getMovementFuture();
-    void clearMovementFuture();
-
     void onWorldChanged();
 }

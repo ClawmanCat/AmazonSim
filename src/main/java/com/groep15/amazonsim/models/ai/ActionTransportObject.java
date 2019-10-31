@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.ai;
+package com.groep15.amazonsim.models.ai;
 
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.utility.Direction;
@@ -11,16 +11,16 @@ public class ActionTransportObject implements IWorldAction {
     private Vec2i dest;
     private ActionCompound actions;
 
-    public ActionTransportObject(IWorldActor actor, Object3D target, Vec2i dest) {
+    public ActionTransportObject(IWorldActor actor, Object3D target, Vec2i src, Vec2i dest) {
         this.target = target;
         this.dest = dest;
 
-        Vec2i shelfpos = new Vec2i(target.getPosition().x, target.getPosition().z);
-        ActionGoto firstMove = new ActionGoto(actor, shelfpos);
+        Vec2i obpos = new Vec2i(target.getPosition().x, target.getPosition().z);
+
         this.actions = new ActionCompound(
-                firstMove,
+                new ActionGoto(actor, src, obpos),
                 new ActionPickup(target),
-                new ActionGoto(actor, shelfpos, dest, actor.getWorld().getTickCount() + firstMove.getMovementFuture().size()),
+                new ActionGoto(actor, obpos, dest),
                 new ActionRelease()
         );
     }
@@ -38,11 +38,6 @@ public class ActionTransportObject implements IWorldAction {
     @Override
     public List<Direction> getMovementFuture() {
         return this.actions.getMovementFuture();
-    }
-
-    @Override
-    public void clearMovementFuture() {
-        this.actions.clearMovementFuture();
     }
 
     @Override

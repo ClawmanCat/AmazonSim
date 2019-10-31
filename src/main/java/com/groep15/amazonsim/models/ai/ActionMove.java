@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.ai;
+package com.groep15.amazonsim.models.ai;
 
 import com.groep15.amazonsim.utility.Direction;
 import com.groep15.amazonsim.utility.Utility;
@@ -51,9 +51,6 @@ public class ActionMove implements IWorldAction {
     public List<Direction> getMovementFuture() {
         return done ? new ArrayList<>() : Arrays.asList(direction);
     }
-
-    @Override
-    public void clearMovementFuture() { }
 
     @Override
     public void onWorldChanged() { }

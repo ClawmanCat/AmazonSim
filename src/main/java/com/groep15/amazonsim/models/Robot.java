@@ -1,8 +1,8 @@
 package com.groep15.amazonsim.models;
 
-import com.groep15.amazonsim.ai.ActionIdle;
-import com.groep15.amazonsim.ai.IWorldAction;
-import com.groep15.amazonsim.ai.IWorldActor;
+import com.groep15.amazonsim.models.ai.ActionIdle;
+import com.groep15.amazonsim.models.ai.IWorldAction;
+import com.groep15.amazonsim.models.ai.IWorldActor;
 
 public class Robot extends Object3D implements IWorldActor {
     private IWorldAction action;

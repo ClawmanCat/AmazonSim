@@ -1,15 +1,22 @@
 package com.groep15.amazonsim.controllers;
 
+import com.groep15.amazonsim.controllers.wms.ShippingReceivingManager;
 import com.groep15.amazonsim.models.Model;
 import com.groep15.amazonsim.models.Object3D;
+import com.groep15.amazonsim.models.World;
 import com.groep15.amazonsim.views.View;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ConcurrentModificationException;
 
 public class SimulationController extends Controller {
+    private ShippingReceivingManager manager;
+
     public SimulationController(Model model) {
         super(model);
+
+        World world = (World) model;
+        this.manager = new ShippingReceivingManager(world);
     }
 
     @Override
@@ -17,8 +24,13 @@ public class SimulationController extends Controller {
         while (true) {
             this.getModel().update();
 
+            if (((World) this.getModel()).getTickCount() % 1000 == 0) {
+                this.manager.receiveObjects(16);
+            }
+
+            this.manager.update();
             try {
-                Thread.sleep(1000 / 240);
+                Thread.sleep(1000 / 30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

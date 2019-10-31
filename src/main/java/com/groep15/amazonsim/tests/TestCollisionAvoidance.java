@@ -1,14 +1,13 @@
 package com.groep15.amazonsim.tests;
 
-import com.groep15.amazonsim.ai.ActionTransportObject;
-import com.groep15.amazonsim.ai.IWorldActor;
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.Shelf;
 import com.groep15.amazonsim.models.World;
+import com.groep15.amazonsim.models.ai.ActionTransportObject;
+import com.groep15.amazonsim.models.ai.IWorldActor;
 import com.groep15.amazonsim.utility.Square2i;
 import com.groep15.amazonsim.utility.Vec2i;
 import com.groep15.amazonsim.utility.WorldReader;
-import com.groep15.amazonsim.wms.ObjectTracker;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ public class TestCollisionAvoidance implements ITest {
 
     public boolean runImpl() {
         World world = WorldReader.ReadWorld(WORLD_PATH);
-        ObjectTracker tracker = world.getTracker();
 
         Square2i targetArea = GetWorldShippingArea(world);
         int destX = 0, destY = 0;
@@ -61,7 +59,7 @@ public class TestCollisionAvoidance implements ITest {
                 Shelf s       = shelves.remove(0);
                 IWorldActor a = free.remove(0);
 
-                a.setAction(new ActionTransportObject(a, s, new Vec2i(destX, destY)));
+                a.setAction(new ActionTransportObject(a, s, new Vec2i(a.getPosition().x, a.getPosition().z), new Vec2i(destX, destY)));
                 Move(a, free, busy);
 
                 targets.put(a, s);

@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.ai;
+package com.groep15.amazonsim.models.ai;
 
 import com.groep15.amazonsim.utility.Direction;
 
@@ -36,11 +36,6 @@ public class ActionCompound implements IWorldAction {
         return a.stream()
                 .map(IWorldAction::getMovementFuture)
                 .reduce(new ArrayList<>(), (tmp, elem) -> { if (elem != null) tmp.addAll(elem); return tmp; });
-    }
-
-    @Override
-    public void clearMovementFuture() {
-        for (IWorldAction a : this.actions) a.clearMovementFuture();
     }
 
     @Override

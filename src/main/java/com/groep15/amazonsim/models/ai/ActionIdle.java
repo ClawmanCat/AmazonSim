@@ -1,41 +1,33 @@
-package com.groep15.amazonsim.ai;
+package com.groep15.amazonsim.models.ai;
 
-import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.utility.Direction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ActionPickup implements IWorldAction {
-    private Object3D target;
-
-    public ActionPickup(Object3D target) {
-        this.target = target;
-    }
+public class ActionIdle implements IWorldAction {
+    private boolean done = false;
 
     @Override
     public boolean progress(IWorldActor obj) {
-        if (isDone()) return false;
+        if (this.isDone()) return false;
 
-        obj.grab(target);
-        this.target = null;
+        obj.setPosition(Math.round(obj.getPosition().x), obj.getPosition().y, Math.round(obj.getPosition().z));
+        this.done = true;
 
         return true;
     }
 
     @Override
     public boolean isDone() {
-        return target == null;
+        return done;
     }
 
     @Override
     public List<Direction> getMovementFuture() {
         return this.isDone() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(Direction.NONE));
     }
-
-    @Override
-    public void clearMovementFuture() { }
 
     @Override
     public void onWorldChanged() { }

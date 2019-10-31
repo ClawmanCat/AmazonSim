@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.ai;
+package com.groep15.amazonsim.models.ai;
 
 import com.groep15.amazonsim.models.Object3D;
 import com.groep15.amazonsim.models.World;
@@ -15,7 +15,7 @@ public interface IWorldActor {
 
     World getWorld();
 
-    void setAction(com.groep15.amazonsim.ai.IWorldAction action);
+    void setAction(IWorldAction action);
     IWorldAction getAction();
 
     void grab(Object3D object);

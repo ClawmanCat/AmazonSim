@@ -1,6 +1,6 @@
 package com.groep15.amazonsim.models;
 
-import com.groep15.amazonsim.wms.WarehouseItem;
+import com.groep15.amazonsim.controllers.wms.WarehouseItem;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -9,7 +9,6 @@ import java.util.List;
 
 public class Shelf extends Object3D {
     private List<WarehouseItem> items = new ArrayList<>();
-    private boolean contentsChanged = false;
 
     public Shelf(World world) {
         super(world);
@@ -32,29 +31,17 @@ public class Shelf extends Object3D {
 
     @Override
     public boolean update() {
-        if (contentsChanged) {
-            contentsChanged = false;
-            return true;
-        }
-
         return false;
     }
 
     public void addItem(WarehouseItem item) {
         items.add(item);
-        contentsChanged = true;
+        dirty = true;
     }
 
     public void removeItem(WarehouseItem item) {
         items.remove(item);
-        contentsChanged = true;
-    }
-
-    public WarehouseItem getItem(int SKU) {
-        return items.stream()
-                .filter(x -> x.SKU == SKU)
-                .findFirst()
-                .get();
+        dirty = true;
     }
 
     public int getItemCount() {

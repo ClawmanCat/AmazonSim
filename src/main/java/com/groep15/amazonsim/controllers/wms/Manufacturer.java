@@ -1,4 +1,4 @@
-package com.groep15.amazonsim.wms;
+package com.groep15.amazonsim.controllers.wms;
 
 import java.util.ArrayList;
 import java.util.Collections;

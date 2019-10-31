@@ -32,4 +32,14 @@ public final class Utility {
         for (T elem : list) if (checker.test(elem)) return true;
         return false;
     }
+
+    public static <T> T Find(List<T> list, Predicate<T> checker) {
+        for (T elem : list) if (checker.test(elem)) return elem;
+        return null;
+    }
+
+    public static <T> void Move(T elem, List<T> from, List<T> to) {
+        from.remove(elem);
+        to.add(elem);
+    }
 }
