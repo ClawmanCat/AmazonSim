@@ -287,13 +287,12 @@ class Lamp extends IWorldObject {
 
         let cover = new THREE.Mesh(Lamp.LampGeometry, Lamp.LampMaterials);
         cover.position.set(0, 0.5, 0.1);
-        cover.material.emissive = 0xFFFFAA;
-        cover.material.emissiveMap = Lamp.LampEmissive;
+
         group.add(cover);
 
-        let light = new THREE.SpotLight(0xFFFFAA);
+        let light = new THREE.PointLight(0xFFFFAA, 1, 100);
         light.position.set(0, 0.6, 0);
-        light.target = this.world.down;
+        //light.target = this.world.down;
         light.castShadow = true;
         group.add(light);
 
