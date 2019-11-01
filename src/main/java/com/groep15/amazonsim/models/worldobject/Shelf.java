@@ -2,13 +2,14 @@ package com.groep15.amazonsim.models.worldobject;
 
 import com.groep15.amazonsim.controllers.wms.WarehouseItem;
 import com.groep15.amazonsim.models.World;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Shelf extends Object3D {
     private List<WarehouseItem> items = new ArrayList<>();
-    //private boolean contentsChanged = false;
+    private boolean contentsChanged = false;
 
     public Shelf(World world) {
         super(world);
@@ -16,37 +17,33 @@ public class Shelf extends Object3D {
         this.sy = (2.4375 / 2.0);
     }
 
-    /*@Override
+    @Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
-        json.put("item_count", items.size());
 
-        JSONArray itemJSON = new JSONArray();
-        for (WarehouseItem i : items) itemJSON.add(i.toJSON());
-
-        json.put("items", itemJSON);
+        json.put("item_count", items.size() / 2);
 
         return json;
-    }*/
+    }
 
     @Override
     public boolean update() {
-        /*if (contentsChanged) {
+        if (contentsChanged) {
             contentsChanged = false;
             return true;
-        }*/
+        }
 
         return false;
     }
 
     public void addItem(WarehouseItem item) {
         items.add(item);
-        //contentsChanged = true;
+        contentsChanged = true;
     }
 
     public void removeItem(WarehouseItem item) {
         items.remove(item);
-        //contentsChanged = true;
+        contentsChanged = true;
     }
 
     public int getItemCount() {

@@ -136,27 +136,22 @@ class Shelf extends IWorldObject {
     constructor(world, json) {
         super(world, json);
 
-        //this.count = json.parameters.item_count;
-        //this.items = json.parameters.items;
+        this.count = json.parameters.item_count;
+        this.boxes = [null, null, null, null, null];
+        this.boxesAdded = [false, false, false, false, false];
     }
 
-    /*update(json) {
+    update(json) {
         super.update(json);
 
         this.count = json.parameters.item_count;
-        this.items = json.parameters.items;
+        if (this.boxes === null || this.boxes === undefined) return;
 
-        // Use .copy?
-        /*if (this.mesh !== null) {
-            this.world.removeObject(this.mesh);
-
-            this.mesh = this.makeMesh();
-            this.setPosition(this.position);
-            this.setRotation(this.rotation);
-
-            this.world.addObject(this.mesh);
+        for (let i = 0; i < 5; ++i) {
+            if (this.count >  i && !this.boxesAdded[i]) this.mesh.add(this.boxes[i]);
+            if (this.count <= i &&  this.boxesAdded[i]) this.mesh.remove(this.boxes[i]);
         }
-    }*/
+    }
 
     makeMesh() {
         let group = new THREE.Group();
@@ -172,33 +167,36 @@ class Shelf extends IWorldObject {
 
             group.add(floor);
 
-            if (Math.floor(this.count / 2) > i) {
-                let boxes = new THREE.Group();
-                boxes.rotation.set(0, (Math.PI / 2.0) * Utility.RandInt(3), 0);
+            let boxes = new THREE.Group();
+            boxes.rotation.set(0, (Math.PI / 2.0) * Utility.RandInt(3), 0);
 
-                let wbig = (15.0 / 32.0) / 2.0 - 0.5;
-                let wsml = (11.0 / 32.0) / 2.0 - 0.5;
-                let hbig = (8.0  / 32.0) / 2.0 + 0.0001;
-                let hsml = (5.0  / 32.0) / 2.0 + 0.0001;
+            let wbig = (15.0 / 32.0) / 2.0 - 0.5;
+            let wsml = (11.0 / 32.0) / 2.0 - 0.5;
+            let hbig = (8.0  / 32.0) / 2.0 + 0.0001;
+            let hsml = (5.0  / 32.0) / 2.0 + 0.0001;
 
-                let box1 = new THREE.Mesh(Shelf.BigBoxGeometry, Shelf.BigBoxMaterials);
-                box1.position.set(3.0 / 32.0 + wbig, h + hbig, 3.0 / 32.0 + wbig);
-                boxes.add(box1);
+            let box1 = new THREE.Mesh(Shelf.BigBoxGeometry, Shelf.BigBoxMaterials);
+            box1.position.set(3.0 / 32.0 + wbig, h + hbig, 3.0 / 32.0 + wbig);
+            boxes.add(box1);
 
-                let box2 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
-                box2.position.set(18.0 / 32.0 + wsml, h + hsml, 3.0 / 32.0 + wsml);
-                boxes.add(box2);
+            let box2 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
+            box2.position.set(18.0 / 32.0 + wsml, h + hsml, 3.0 / 32.0 + wsml);
+            boxes.add(box2);
 
-                let box3 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
-                box3.position.set(18.0 / 32.0 + wsml, h + hsml, 14.0 / 32.0 + wsml);
-                boxes.add(box3);
+            let box3 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
+            box3.position.set(18.0 / 32.0 + wsml, h + hsml, 14.0 / 32.0 + wsml);
+            boxes.add(box3);
 
-                let box4 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
-                box4.position.set(3.0 / 32.0 + wsml, h + hsml, 18.0 / 32.0 + wsml);
-                boxes.add(box4);
+            let box4 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
+            box4.position.set(3.0 / 32.0 + wsml, h + hsml, 18.0 / 32.0 + wsml);
+            boxes.add(box4);
 
+            if (this.count > i) {
                 group.add(boxes);
+                this.boxesAdded[i] = true;
             }
+
+            this.boxes[i] = boxes;
         }
 
         return group;
