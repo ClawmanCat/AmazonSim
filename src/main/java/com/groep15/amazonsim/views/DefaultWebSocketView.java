@@ -1,7 +1,7 @@
 package com.groep15.amazonsim.views;
 
 import com.groep15.amazonsim.base.Command;
-import com.groep15.amazonsim.models.Object3D;
+import com.groep15.amazonsim.models.worldobject.Object3D;
 import org.json.simple.JSONObject;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;

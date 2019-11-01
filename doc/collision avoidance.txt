@@ -1,0 +1,28 @@
+self.calculatePath(Actor[] src, Vec2i dest) {
+	for (Actor a : actors) {
+		// Prevent infinite recursion. If the update of a caused this update, don't update a again.
+		if (a == self || src.contains(a)) continue;
+
+		// If a's path goes over our destination, have it reroute.
+		if (a.path.contains(dest)) {
+			bool old = world.setOccupied(dest, true);
+			a.calculatePath(src.add(a), a.dest);
+			world.setOccupied(dest, old);
+		}
+	}
+
+	Vec2i[] path = world.breadthFirstSearch(self.position, dest);
+
+	// While there are collisions on our path, wait at the last point that's not on the path of the thing we're gonna collide with.
+	while ((collider, where, when) = world.getCollisions(path); collider != null) {
+		lastSafeIndex = when;
+		while (collider.path.contains(path[lastSafeIndex])) --lastSafeIndex;
+
+		// Wait before going onto the path of the other actor.
+		AddWaitPoint(path, lastSafeIndex);
+
+		// Clear waitpoints beyond this one, as they have been invalidated by another waitpoint being inserted earlier.
+		// (since we'll arrive there later, there might not even be a collision there anymore.)
+		RemoveAllWaitPointsAfter(path, lastSafeIndex);
+	}
+}

@@ -1,0 +1,45 @@
+This file is the default warehouse layout.
+
+#BEGINLEGEND
+{"key":"W", "value":[{"type":"wall",  		"properties": { "y": 2.00 }}]}
+{"key":"F", "value":[{"type":"floor", 		"properties": { "y": 0.00 }}]}
+{"key":"S", "value":[{"type":"shelf", 		"properties": { "y": 1.21875 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"R", "value":[{"type":"robot", 		"properties": { "y": 0.15    }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"L", "value":[{"type":"light", 		"properties": { "y": 3.0     }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"X", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"danger_area" }}]}
+{"key":"0", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"shipping" }}]}
+{"key":"1", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"receiving" }}]}
+#ENDLEGEND
+
+
+#BEGINPROPERTIES
+{
+	"shipping_area":  { "begin": { "x": 1.0, "y": 0.0 }, "end": { "x": 6.0,  "y": 5.0 } },
+	"receiving_area": { "begin": { "x": 7.0, "y": 0.0 }, "end": { "x": 12.0, "y": 5.0 } }
+}
+#ENDPROPERTIES
+
+
+#BEGINLAYOUT
+WXXXXXWXXXXXWWWWWWWWWWWWWWWWWWWWWWW
+WXXXXXWXXXXXWSSSSSSSSSSSSSSSSSSSSSW
+WXX0XXWXX1XXWFFFFFFFFFFFFFFFFFFFFFW
+WXXXXXWXXXXXWFSSSSSSSSSFSSSSSSSSSFW
+WXXXXXWXXXXXWFFFFFFFFFFFFFFFFFFFFFW
+WFFFFFLFFFFFLFSSSSSSSSSFSSSSSSSSSFW
+WFRFRFRFRFRFFFFFFFFFFFFFFFFFFFFFFFW
+WFFFFFFFFFFFFFSSSSSSSSSFSSSSSSSSSFW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSFSSSSSSSSSFW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSFSSSSSSSSSFW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSFSSSSSSSSSFW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSFSSSSSSSSSFW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WFSSSSSSSSSSSFSSSSSSSSSFSSSSSSSSSFW
+WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW
+WSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+#ENDLAYOUT

@@ -11,8 +11,8 @@ public class Vec2i {
     }
 
     public Vec2i(double x, double y) {
-        this.x = (int) Math.floor(x);
-        this.y = (int) Math.floor(y);
+        this.x = (int) Math.round(x);
+        this.y = (int) Math.round(y);
     }
 
 

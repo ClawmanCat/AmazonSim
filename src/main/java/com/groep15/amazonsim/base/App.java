@@ -2,7 +2,7 @@ package com.groep15.amazonsim.base;
 
 import com.groep15.amazonsim.controllers.Controller;
 import com.groep15.amazonsim.controllers.SimulationController;
-import com.groep15.amazonsim.utility.WorldReader;
+import com.groep15.amazonsim.models.WorldReader;
 import com.groep15.amazonsim.views.DefaultWebSocketView;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,7 +24,7 @@ import java.io.IOException;
 @EnableAutoConfiguration
 @EnableWebSocket
 public class App extends SpringBootServletInitializer implements WebSocketConfigurer {
-    public static final String WORLD_PATH = new File("src/main/resources/layout/layout_04.worlddef").getAbsolutePath();
+    public static final String WORLD_PATH = new File("src/main/resources/layout/master.worlddef").getAbsolutePath();
 
     public static Controller Controller = null;
     public static void main(String[] args) {

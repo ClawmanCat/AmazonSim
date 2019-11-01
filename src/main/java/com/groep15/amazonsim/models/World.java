@@ -1,11 +1,9 @@
 package com.groep15.amazonsim.models;
 
-import com.groep15.amazonsim.ai.IWorldActor;
-import com.groep15.amazonsim.base.App;
+import com.groep15.amazonsim.models.ai.IWorldActor;
+import com.groep15.amazonsim.models.worldobject.Object3D;
+import com.groep15.amazonsim.models.worldobject.ProxyObject3D;
 import com.groep15.amazonsim.utility.Vec2i;
-import com.groep15.amazonsim.utility.WorldGraph;
-import com.groep15.amazonsim.wms.ObjectTracker;
-import com.groep15.amazonsim.wms.WarehouseItemFactory;
 import org.json.simple.JSONObject;
 
 import java.beans.PropertyChangeListener;
@@ -21,8 +19,6 @@ public class World implements Model {
     private int w, h;
     private WorldGraph graph;
     private JSONObject settings;
-    private ObjectTracker tracker;
-    private WarehouseItemFactory factory;
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -33,19 +29,6 @@ public class World implements Model {
         this.h = h;
         this.graph = new WorldGraph(this);
         this.settings = new JSONObject();
-        this.factory = new WarehouseItemFactory();
-    }
-
-
-    private void postInit() {
-        // Object may be modified between constructor and 1st tick.
-        // Stuff that isn't needed until the first tick may be added here.
-        this.tracker = new ObjectTracker(
-                this.worldObjects.stream()
-                        .filter(x -> x instanceof Shelf)
-                        .map(x -> (Shelf) x)
-                        .collect(Collectors.toList())
-        );
     }
 
 
@@ -66,10 +49,6 @@ public class World implements Model {
 
     @Override
     public void update() {
-        if (App.Controller != null && !App.Controller.hasViews()) return;
-
-        if (tick == 0) postInit();
-
         for (Object3D object : this.worldObjects) {
             if (object.update()) {
                 pcs.firePropertyChange(Model.UPDATE_COMMAND, null, new ProxyObject3D(object));
@@ -128,11 +107,6 @@ public class World implements Model {
 
 
     public WorldGraph getWorldGraph() { return this.graph; }
-
-
-    public ObjectTracker getTracker() {
-        return tracker;
-    }
 
 
     public List<IWorldActor> getActors() {
