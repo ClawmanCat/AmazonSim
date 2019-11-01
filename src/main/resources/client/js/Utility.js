@@ -34,4 +34,9 @@ class Utility {
 
         return new THREE.MeshBasicMaterial({ map: textureData, side: THREE.DoubleSide, transparent: transparent });
     }
+
+
+    static RandInt(max) {
+        return Math.floor(Math.random() * max);
+    }
 }

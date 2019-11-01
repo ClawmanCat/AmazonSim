@@ -112,6 +112,26 @@ class Shelf extends IWorldObject {
     static FloorGeometry  = new THREE.PlaneGeometry(0.99, 0.99);
     static FloorMaterials = Utility.LoadTextureOrDefault("shelf_inside");
 
+    static BigBoxGeometry  = new THREE.BoxGeometry(15.0 / 32.0, 8.0 / 32.0, 15.0 / 32.0);
+    static BigBoxMaterials = [
+        Utility.LoadTextureOrDefault("big_box_side"),
+        Utility.LoadTextureOrDefault("big_box_side"),
+        Utility.LoadTextureOrDefault("big_box_top"),
+        Utility.LoadTextureOrDefault("big_box_top"),
+        Utility.LoadTextureOrDefault("big_box_side"),
+        Utility.LoadTextureOrDefault("big_box_side")
+    ];
+
+    static SmallBoxGeometry  = new THREE.BoxGeometry(11.0 / 32.0, 5.0 / 32.0, 11.0 / 32.0);
+    static SmallBoxMaterials = [
+        Utility.LoadTextureOrDefault("small_box_side"),
+        Utility.LoadTextureOrDefault("small_box_side"),
+        Utility.LoadTextureOrDefault("small_box_top"),
+        Utility.LoadTextureOrDefault("small_box_top"),
+        Utility.LoadTextureOrDefault("small_box_side"),
+        Utility.LoadTextureOrDefault("small_box_side")
+    ];
+
     makeMesh() {
         let group = new THREE.Group();
 
@@ -125,6 +145,33 @@ class Shelf extends IWorldObject {
             floor.rotation.set(Math.PI / 2.0, 0, 0);
 
             group.add(floor);
+
+
+            let boxes = new THREE.Group();
+            boxes.rotation.set(0, (Math.PI / 2.0) * Utility.RandInt(3), 0);
+
+            let wbig = (15.0 / 32.0) / 2.0 - 0.5;
+            let wsml = (11.0 / 32.0) / 2.0 - 0.5;
+            let hbig = (8.0  / 32.0) / 2.0 + 0.0001;
+            let hsml = (5.0  / 32.0) / 2.0 + 0.0001;
+
+            let box1 = new THREE.Mesh(Shelf.BigBoxGeometry, Shelf.BigBoxMaterials);
+            box1.position.set(3.0 / 32.0 + wbig, h + hbig, 3.0 / 32.0 + wbig);
+            boxes.add(box1);
+
+            let box2 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
+            box2.position.set(18.0 / 32.0 + wsml, h + hsml, 3.0 / 32.0 + wsml);
+            boxes.add(box2);
+
+            let box3 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
+            box3.position.set(18.0 / 32.0 + wsml, h + hsml, 14.0 / 32.0 + wsml);
+            boxes.add(box3);
+
+            let box4 = new THREE.Mesh(Shelf.SmallBoxGeometry, Shelf.SmallBoxMaterials);
+            box4.position.set(3.0 / 32.0 + wsml, h + hsml, 18.0 / 32.0 + wsml);
+            boxes.add(box4);
+
+            if (i % 2 === 0) group.add(boxes);
         }
 
         return group;
