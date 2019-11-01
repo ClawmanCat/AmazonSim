@@ -5,10 +5,8 @@ import com.groep15.amazonsim.models.worldobject.Object3D;
 import com.groep15.amazonsim.utility.Direction;
 import com.groep15.amazonsim.utility.Utility;
 import com.groep15.amazonsim.utility.Vec2i;
-import org.javatuples.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class WorldGraph {
     private boolean[][] map;
@@ -53,34 +51,9 @@ public class WorldGraph {
     // Find the shortest path through BFS.
     // Setting avoid actors does not do proper collision avoidance, it just generates a path without collisions,
     // and if it can't do so, it will return null, rather than modifying the path with wait points.
-    public List<Direction> calculatePath(IWorldActor actor, Vec2i from, Vec2i to, boolean avoidActors) {
+    public List<Direction> calculatePath(IWorldActor actor, Vec2i from, Vec2i to) {
         if (map == null) update();
 
-        // Make a copy of the map so we can safely modify it.
-        boolean[][] tmpmap = Arrays.stream(map).map(boolean[]::clone).toArray(boolean[][]::new);
-
-        // Mark the paths of other actors as occupied temporarily.
-        if (avoidActors) {
-            for (IWorldActor a : actors) {
-                if (a == actor) continue;
-
-                List<Direction> path = a.getAction().getMovementFuture();
-                Vec2i start = new Vec2i(a.getPosition().x, a.getPosition().z);
-
-                List<Pair<Vec2i, Boolean>> modpoints = Utility.DirectionsToPositions(path, start).stream()
-                        .filter(v -> v.x >= 0 && v.y >= 0)                                  // ??? why is the path going outside the map?
-                        .filter(v -> v.x < tmpmap.length && v.y < tmpmap[v.x].length)       // This one is just for good measure.
-                        .map(v -> new Pair<>(v, tmpmap[v.x][v.y]))
-                        .collect(Collectors.toList());
-
-                for (Pair<Vec2i, Boolean> p : modpoints) {
-                    Vec2i pos = p.getValue0();
-                    tmpmap[pos.x][pos.y] = false;
-                }
-            }
-        }
-
-        // Run BFS on the boolean tmpmap.
         Map<Vec2i, Direction> parents = new HashMap<>();
         Queue<Vec2i> queue = new LinkedList<>();
 
@@ -97,10 +70,10 @@ public class WorldGraph {
             for (Direction d : Direction.values()) {
                 Vec2i next = new Vec2i(pos.x + d.movement.x, pos.y + d.movement.y);
 
-                if (next.x < 0 || next.x >= tmpmap.length)              continue;       // Check X-coord inside bounds.
-                if (next.y < 0 || next.y >= tmpmap[next.x].length)      continue;       // Check Y-coord inside bounds.
-                if (!tmpmap[next.x][next.y] && !next.equals(to))        continue;       // Check space not occupied. (can always move to dest.)
-                if (parents.containsKey(next))                          continue;       // Check node already discovered.
+                if (next.x < 0 || next.x >= map.length)              continue;       // Check X-coord inside bounds.
+                if (next.y < 0 || next.y >= map[next.x].length)      continue;       // Check Y-coord inside bounds.
+                if (!map[next.x][next.y] && !next.equals(to))        continue;       // Check space not occupied. (can always move to dest.)
+                if (parents.containsKey(next))                       continue;       // Check node already discovered.
 
                 parents.put(next, d.invert());
                 queue.add(next);
@@ -125,8 +98,13 @@ public class WorldGraph {
             for (int i = 0; i < pathpos.size(); ++i) {
                 Vec2i pos = pathpos.get(i);
 
-                if (occupations.containsKey(pos)) occupations.get(pos).add(i);
-                else occupations.put(pos, new ArrayList<>(Arrays.asList(i)));
+                for (int j = -1; j <= 1; ++j) {
+                    if (i + j < 0) continue;
+
+                    // Occupy for 3 ticks to prevent semi-collisions
+                    if (occupations.containsKey(pos)) occupations.get(pos).add(i + j);
+                    else occupations.put(pos, new ArrayList<>(Arrays.asList(i + j)));
+                }
             }
         }
 
