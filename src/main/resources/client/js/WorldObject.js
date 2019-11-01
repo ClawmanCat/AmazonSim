@@ -12,6 +12,9 @@ class WorldObjectFactory extends ISocketUpdatableFactory {
             case "robot":           result = new Robot(this, json);             break;
             case "ambient_light":   result = new AmbientLight(this, json);      break;
             case "floor":           result = new Floor(this, json);             break;
+            case "wall":            result = new Wall(this, json);              break;
+            case "shelf":           result = new Shelf(this, json);             break;
+            case "truck":           result = new Truck(this, json);             break;
             default:                result = new Unknown(this, json);           break;
         }
 
@@ -161,4 +164,63 @@ class Unknown extends IWorldObject {
 
         return new THREE.Mesh(Unknown.Geometry, materials);
     }
+
 }
+
+class Wall extends IWorldObject {
+    static Geometry  = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+    static Materials = [
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_wall.png" ),  side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_wall.png" ),  side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_wall.png" ),  side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_wall.png" ),  side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_wall.png" ),  side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_wall.png" ),  side: THREE.DoubleSide })
+    ];
+
+    constructor(world, json) {
+        super(world, json);
+
+        this.texture = json.parameters.texture;
+    }
+
+    makeMesh() {
+        return new THREE.Mesh(Wall.Geometry, Wall.Materials);
+    }
+    }
+
+class Shelf extends IWorldObject {
+    static Geometry  = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+    static Materials = [
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_shelf.png" ),  side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_shelf.png" ),  side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_shelf.png" ),  side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_shelf.png" ),  side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_shelf.png" ),  side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/warehouse_shelf.png" ),  side: THREE.DoubleSide })
+    ];
+
+    constructor(world, json) {
+        super(world, json);
+
+        this.texture = json.parameters.texture;
+    }
+
+    makeMesh() {
+        return new THREE.Mesh(Shelf.Geometry, Shelf.Materials);
+    }
+}
+
+class Truck extends IWorldObject {
+
+    static Geometry  = new THREE.BoxGeometry(1.8, 0.6, 1.8);
+    static loader = new THREE.ObjectLoader();
+    static truck = loader.load('models/delivery_truck.json');
+
+    makeMesh() {
+        return new THREE.Mesh(Truck.Geometry, Truck.truck);
+    }
+}
+
+
+
