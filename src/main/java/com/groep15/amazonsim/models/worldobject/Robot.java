@@ -48,12 +48,14 @@ public class Robot extends Object3D implements IWorldActor {
     @Override
     public void grab(Object3D object) {
         this.obj = object;
+        this.obj.dirty = true;
         world.getWorldGraph().update();
     }
 
     @Override
     public void release() {
         this.obj.y = this.obj.sy;
+        this.obj.dirty = true;
         this.obj = null;
 
         world.getWorldGraph().update();

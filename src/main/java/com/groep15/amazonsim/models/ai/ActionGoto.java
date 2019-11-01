@@ -24,7 +24,9 @@ public class ActionGoto implements IWorldAction {
         if (isDone()) return false;
 
         // If we don't have a path, try and get a new one.
-        if (path == null) onWorldChanged(new ArrayList<>());
+        //if (path == null) onWorldChanged(new ArrayList<>());
+        //if (path == null) return true;
+        onWorldChanged(new ArrayList<>());
         if (path == null) return true;
 
         if (path.size() == 0 && (mover == null || mover.isDone())) return true;
@@ -56,8 +58,8 @@ public class ActionGoto implements IWorldAction {
         // If no such path exists, take one that overlaps another's path, and wait until its clear.
         this.path = actor.getWorld().getWorldGraph().calculatePath(actor, src, dest);
 
-        if (actor.getWorld().getWorldGraph().collides(this.actor, src, this.path)) {
+        /*if (actor.getWorld().getWorldGraph().collides(this.actor, src, this.path)) {
             this.path = null;   // Can't move yet, just wait.
-        }
+        }*/
     }
 }

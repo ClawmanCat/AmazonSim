@@ -34,7 +34,7 @@ public class SimulationController extends Controller {
 
             this.manager.update();
             try {
-                Thread.sleep((long) (1000.0 / 30.0));
+                Thread.sleep((long) (1000.0 / 60.0));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

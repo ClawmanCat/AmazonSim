@@ -15,8 +15,12 @@ public class ActionTransportObject implements IWorldAction {
         this.target = target;
         this.dest = dest;
 
+        IWorldAction gotoShelf = apos.equals(spos)
+                ? new ActionCompound()
+                : new ActionGoto(actor, apos, spos);
+
         this.actions = new ActionCompound(
-                new ActionGoto(actor, apos, spos),
+                gotoShelf,
                 new ActionPickup(target),
                 new ActionGoto(actor, spos, dest),
                 new ActionRelease()

@@ -1,5 +1,7 @@
 package com.groep15.amazonsim.models;
 
+import com.groep15.amazonsim.models.worldobject.Object3D;
+
 public class Light extends Object3D {
     public Light(World world) {
         super(world);

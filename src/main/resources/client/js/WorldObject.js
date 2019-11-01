@@ -136,18 +136,18 @@ class Shelf extends IWorldObject {
     constructor(world, json) {
         super(world, json);
 
-        this.count = json.parameters.item_count;
-        this.items = json.parameters.items;
+        //this.count = json.parameters.item_count;
+        //this.items = json.parameters.items;
     }
 
-    update(json) {
+    /*update(json) {
         super.update(json);
 
         this.count = json.parameters.item_count;
         this.items = json.parameters.items;
 
         // Use .copy?
-        if (this.mesh !== null) {
+        /*if (this.mesh !== null) {
             this.world.removeObject(this.mesh);
 
             this.mesh = this.makeMesh();
@@ -156,7 +156,7 @@ class Shelf extends IWorldObject {
 
             this.world.addObject(this.mesh);
         }
-    }
+    }*/
 
     makeMesh() {
         let group = new THREE.Group();

@@ -44,7 +44,7 @@ public class WorldGraph {
             if (old != null && old[pos.x][pos.y] != map[pos.x][pos.y]) changed = true;
         }
 
-        if (changed) for (IWorldActor actor : actors) actor.getAction().onWorldChanged(new ArrayList<>());
+        //if (changed) for (IWorldActor actor : actors) actor.getAction().onWorldChanged(new ArrayList<>());
     }
 
 
@@ -53,6 +53,19 @@ public class WorldGraph {
     // and if it can't do so, it will return null, rather than modifying the path with wait points.
     public List<Direction> calculatePath(IWorldActor actor, Vec2i from, Vec2i to) {
         if (map == null) update();
+
+        // Mark other paths as occupied.
+        boolean[][] tmpmap = Arrays.stream(map).map(boolean[]::clone).toArray(boolean[][]::new);
+        for (IWorldActor a : actors) {
+            if (a == actor) continue;
+
+            List<Vec2i> path = Utility.DirectionsToPositions(
+                    a.getAction().getMovementFuture(),
+                    new Vec2i(a.getPosition().x, a.getPosition().z)
+            );
+
+            for (Vec2i v : path) tmpmap[v.x][v.y] = false;
+        }
 
         Map<Vec2i, Direction> parents = new HashMap<>();
         Queue<Vec2i> queue = new LinkedList<>();
@@ -72,7 +85,7 @@ public class WorldGraph {
 
                 if (next.x < 0 || next.x >= map.length)              continue;       // Check X-coord inside bounds.
                 if (next.y < 0 || next.y >= map[next.x].length)      continue;       // Check Y-coord inside bounds.
-                if (!map[next.x][next.y] && !next.equals(to))        continue;       // Check space not occupied. (can always move to dest.)
+                if (!tmpmap[next.x][next.y] && !next.equals(to))     continue;       // Check space not occupied. (can always move to dest.)
                 if (parents.containsKey(next))                       continue;       // Check node already discovered.
 
                 parents.put(next, d.invert());
