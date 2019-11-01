@@ -2,7 +2,7 @@ package com.groep15.amazonsim.base;
 
 import com.groep15.amazonsim.controllers.Controller;
 import com.groep15.amazonsim.controllers.SimulationController;
-import com.groep15.amazonsim.utility.WorldReader;
+import com.groep15.amazonsim.models.WorldReader;
 import com.groep15.amazonsim.views.DefaultWebSocketView;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

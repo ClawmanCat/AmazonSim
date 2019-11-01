@@ -1,7 +1,7 @@
 package com.groep15.amazonsim.views;
 
 import com.groep15.amazonsim.base.Command;
-import com.groep15.amazonsim.models.Object3D;
+import com.groep15.amazonsim.models.worldobject.Object3D;
 
 /*
  * Deze interface is de beschrijving van een view binnen het systeem.
