@@ -50,6 +50,13 @@ class World {
             false
         );
 
+        let light = new THREE.AmbientLight(0x404040);
+        this.scene.add(light);
+
+        this.down = new THREE.Object3D();
+        this.down.position.set(0, -100000000, 0);
+        this.scene.add(this.down);
+
         // Socket updater
         this.updater = new SocketManager(new WorldObjectFactory(this));
 

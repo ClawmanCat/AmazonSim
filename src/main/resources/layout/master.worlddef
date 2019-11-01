@@ -5,6 +5,7 @@ This file is the default warehouse layout.
 {"key":"F", "value":[{"type":"floor", 		"properties": { "y": 0.00 }}]}
 {"key":"S", "value":[{"type":"shelf", 		"properties": { "y": 1.21875 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
 {"key":"R", "value":[{"type":"robot", 		"properties": { "y": 0.15    }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"L", "value":[{"type":"light", 		"properties": { "y": 3.0     }}, {"type":"floor", "properties": { "y": 0.00 }}]}
 {"key":"X", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"danger_area" }}]}
 {"key":"0", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"shipping" }}]}
 {"key":"1", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"receiving" }}]}
@@ -25,7 +26,7 @@ WXXXXXWXXXXXWSSSSSSSSSSSSSSSSSSSSSW
 WXX0XXWXX1XXWFFFFFFFFFFFFFFFFFFFFFW
 WXXXXXWXXXXXWFSSSSSSSSSSSSSSSSSSSFW
 WXXXXXWXXXXXWFFFFFFFFFFFFFFFFFFFFFW
-WFFFFFFFFFFFFFSSSSSSSSSSSSSSSSSSSFW
+WFFFFFLFFFFFLFSSSSSSSSSSSSSSSSSSSFW
 WFRFRFRFRFRFFFFFFFFFFFFFFFFFFFFFFFW
 WFFFFFFFFFFFFFSSSSSSSSSSSSSSSSSSSFW
 WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW

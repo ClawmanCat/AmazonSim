@@ -20,7 +20,7 @@ public class Shelf extends Object3D {
     @Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
-        json.put("itemCount", items.size());
+        json.put("item_count", items.size());
 
         JSONArray itemJSON = new JSONArray();
         for (WarehouseItem i : items) itemJSON.add(i.toJSON());
