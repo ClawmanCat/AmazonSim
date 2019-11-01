@@ -3,12 +3,13 @@ class World {
         // ThreeJS Renderer Setup
         this.scene = new THREE.Scene();
 
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight + 5);
+
         document.body.appendChild(this.renderer.domElement);
 
-        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         //this.controller = new THREE.PointerLockControls(this.camera, this.renderer.domElement);
         this.controller = new THREE.PointerLockControls(this.camera, this.renderer.domElement);
@@ -49,19 +50,15 @@ class World {
             false
         );
 
+        let light = new THREE.AmbientLight(0x404040);
+        this.scene.add(light);
+
+        this.down = new THREE.Object3D();
+        this.down.position.set(0, -100000000, 0);
+        this.scene.add(this.down);
 
         // Socket updater
         this.updater = new SocketManager(new WorldObjectFactory(this));
-
-
-        // Basic world layout.
-        // TODO: Load this from the server instead.
-        //let floor = new Floor(this, Utility.MakeWorldObjectJSON("fake-uuid-01", [ 15, 0, 15 ], [ Math.PI / 2.0, 0, 0 ]));
-        let light = new AmbientLight(this, Utility.MakeWorldObjectJSON("fake-uuid-02", [ 0, 0, 0 ], [ 0, 0, 0 ], { intensity: 4, color: 0x404040 }));
-        //let cursor = new Cursor(this, Utility.MakeWorldObjectJSON("fake-uuid-03", [0, 0, -1], [0, 0, 0]));
-
-        //this.addObject(floor);
-        this.addObject(light);
 
         // Render loop
         this.frameCount = 0;
