@@ -18,20 +18,24 @@ public class DefaultWebSocketView implements View {
 
     @Override
     public void update(String event, Object3D data) {
-        synchronized (session) {
-            try {
-                if (this.session.isOpen()) {
-                    JSONObject json = new JSONObject();
-                    json.put("command", event);
-                    json.put("parameters", data.toJSON());
+        try {
+            synchronized (session) {
+                try {
+                    if (this.session.isOpen()) {
+                        JSONObject json = new JSONObject();
+                        json.put("command", event);
+                        json.put("parameters", data.toJSON());
 
-                    this.session.sendMessage(new TextMessage(json.toJSONString()));
-                } else {
+                        this.session.sendMessage(new TextMessage(json.toJSONString()));
+                    } else {
+                        this.onClose.execute();
+                    }
+                } catch (IOException e) {
                     this.onClose.execute();
                 }
-            } catch (IOException e) {
-                this.onClose.execute();
             }
+        } catch (Exception e) {
+            System.out.println("Error in server. One or more messages may have been discarded.");
         }
     }
 

@@ -1,26 +1,60 @@
 This file is the default warehouse layout.
 
 #BEGINLEGEND
-{"key":"W", "value":[{"type":"wall",  		"properties": { "y": 2.00 }}]}
-{"key":"F", "value":[{"type":"floor", 		"properties": { "y": 0.00 }}]}
-{"key":"S", "value":[{"type":"shelf", 		"properties": { "y": 1.21875 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
-{"key":"R", "value":[{"type":"robot", 		"properties": { "y": 0.15    }}, {"type":"floor", "properties": { "y": 0.00 }}]}
-{"key":"L", "value":[{"type":"light", 		"properties": { "y": 3.0     }}, {"type":"floor", "properties": { "y": 0.00 }}]}
-{"key":"X", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"danger_area" }}]}
-{"key":"0", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"shipping" }}]}
-{"key":"1", "value":[{"type":"floor", 		"properties": { "y": 0.00, "texture":"receiving" }}]}
+{"key":"W", "value":[{"type":"wall",  		  "properties": { "y": 2.00 }}]}
+{"key":"E", "value":[{"type":"invisiblewall", "properties": { "y": 2.00 }}]}
+{"key":"F", "value":[{"type":"floor", 		  "properties": { "y": 0.00 }}]}
+{"key":"S", "value":[{"type":"shelf",   	  "properties": { "y": 1.21875 }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"R", "value":[{"type":"robot", 		  "properties": { "y": 0.15    }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"L", "value":[{"type":"light", 		  "properties": { "y": 3.0     }}, {"type":"floor", "properties": { "y": 0.00 }}]}
+{"key":"X", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"danger_area" }}]}
+{"key":"A", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"road" }}]}
+{"key":"B", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"road" }}, {"type":"invisiblewall", "properties": { "y": 2.00 }}]}
+{"key":"0", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"shipping" }}]}
+{"key":"1", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"receiving" }}]}
+{"key":"2", "value":[{"type":"truck"		  "properties": { "y": 3.65, "task":"shipping",  "interval":1500.0, "distance":27.0 }}]}
+{"key":"3", "value":[{"type":"truck"		  "properties": { "y": 3.65, "task":"receiving", "interval":1500.0, "distance":27.0 }}]}
 #ENDLEGEND
 
 
 #BEGINPROPERTIES
 {
-	"shipping_area":  { "begin": { "x": 1.0, "y": 0.0 }, "end": { "x": 6.0,  "y": 5.0 } },
-	"receiving_area": { "begin": { "x": 7.0, "y": 0.0 }, "end": { "x": 12.0, "y": 5.0 } }
+    "warehouse_area":  { "begin": { "x": 0.0, "y": 29.0 }, "end": { "x": 35.0, "y": 49.0 } },
+	"shipping_area":   { "begin": { "x": 1.0, "y": 29.0 }, "end": { "x": 6.0,  "y": 34.0 } },
+	"receiving_area":  { "begin": { "x": 7.0, "y": 29.0 }, "end": { "x": 12.0, "y": 34.0 } }
 }
 #ENDPROPERTIES
 
-
 #BEGINLAYOUT
+  A2     3 A
+     A  A
+  A
+ A  A  A  A 
+  A     A A 
+  A A  A   A
+ A  AA A AAA
+ A AAA AA AA
+ AAA A AAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+ AAAAA AAAAA
+EBBBBBEBBBBBE
 WXXXXXWXXXXXWWWWWWWWWWWWWWWWWWWWWWW
 WXXXXXWXXXXXWSSSSSSSSSSSSSSSSSSSSSW
 WXX0XXWXX1XXWFFFFFFFFFFFFFFFFFFFFFW

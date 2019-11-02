@@ -19,19 +19,16 @@ public class SimulationController extends Controller {
         this.manager = new ShippingReceivingManager(world);
     }
 
+    public ShippingReceivingManager getSRManager() {
+        return this.manager;
+    }
+
     @Override
     public void run() {
         while (true) {
-            if (!hasViews()) continue;
+            if (!this.hasViews()) continue;
 
             this.getModel().update();
-            int tick = ((World) this.getModel()).getTickCount();
-
-            if (tick % 1000 == 0 || tick == 100) {
-                System.out.println("Generating receive requests @ t = " + ((World) this.getModel()).getTickCount());
-                this.manager.receiveObjects(32);
-            }
-
             this.manager.update();
             try {
                 Thread.sleep((long) (1000.0 / 60.0));

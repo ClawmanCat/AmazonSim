@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ActionGoto implements IWorldAction {
+    static double lowest = 100;
+
     private Vec2i from, dest;
     private List<Direction> path;
     private ActionMove mover;
@@ -23,9 +25,6 @@ public class ActionGoto implements IWorldAction {
     public boolean progress(IWorldActor obj) {
         if (isDone()) return false;
 
-        // If we don't have a path, try and get a new one.
-        //if (path == null) onWorldChanged(new ArrayList<>());
-        //if (path == null) return true;
         onWorldChanged(new ArrayList<>());
         if (path == null) return true;
 
@@ -50,16 +49,6 @@ public class ActionGoto implements IWorldAction {
         if (this.isDone() || doNotDisturb.contains(actor)) return;
 
         Vec2i src = new Vec2i(actor.getPosition().x, actor.getPosition().z);
-
-        // Try to get a path that doesn't overlap anyone else's path.
-        //this.path = actor.getWorld().getWorldGraph().calculatePath(actor, src, dest, true);
-        //if (path != null) return;
-
-        // If no such path exists, take one that overlaps another's path, and wait until its clear.
         this.path = actor.getWorld().getWorldGraph().calculatePath(actor, src, dest);
-
-        /*if (actor.getWorld().getWorldGraph().collides(this.actor, src, this.path)) {
-            this.path = null;   // Can't move yet, just wait.
-        }*/
     }
 }

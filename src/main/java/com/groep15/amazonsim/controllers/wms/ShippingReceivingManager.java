@@ -16,6 +16,46 @@ import java.util.stream.Collectors;
 
 // Generate item shipping and receiving requests for the robots to complete.
 public class ShippingReceivingManager {
+    // Token can be used to check if a requested action has completed.
+    public static interface IToken {
+        boolean completed();
+    }
+
+    public static class ShippingToken implements IToken {
+        private ShippingReceivingManager manager;
+        private List<Pair<Shelf, List<WarehouseItem>>> tasks;
+
+        public ShippingToken(ShippingReceivingManager manager, List<Pair<Shelf, List<WarehouseItem>>> tasks) {
+            this.manager = manager;
+            this.tasks = tasks;
+        }
+
+        @Override
+        public boolean completed() {
+            for (Pair<Shelf, List<WarehouseItem>> task : tasks) if (!manager.isCompleted(task)) return false;
+            return true;
+        }
+    }
+
+    public static class ReceivingToken implements IToken {
+        private ShippingReceivingManager manager;
+        private List<List<WarehouseItem>> tasks;
+
+        public ReceivingToken(ShippingReceivingManager manager, List<List<WarehouseItem>> tasks) {
+            this.manager = manager;
+            this.tasks = tasks;
+        }
+
+        @Override
+        public boolean completed() {
+            for (List<WarehouseItem> task : tasks) if (!manager.isCompleted(task)) return false;
+            return true;
+        }
+    }
+
+
+
+
     public static final int SHELF_ITEM_CAPACITY     = 10;
     public static final int TIME_TO_TRANSFER_ITEM   = 10;
 
@@ -30,8 +70,8 @@ public class ShippingReceivingManager {
     private Square2i receiveArea, deliveryArea;
     private List<Vec2i> receivePoints, deliveryPoints;
 
-    private List<List<WarehouseItem>> pendingReceives;
-    private List<Pair<Shelf, List<WarehouseItem>>> pendingDeliveries;
+    private List<List<WarehouseItem>> pendingReceives, workingReceives;
+    private List<Pair<Shelf, List<WarehouseItem>>> pendingDeliveries, workingDeliveries;
 
     public ShippingReceivingManager(World world) {
         this.world = world;
@@ -59,6 +99,26 @@ public class ShippingReceivingManager {
 
         this.pendingReceives   = new ArrayList<>();
         this.pendingDeliveries = new ArrayList<>();
+
+        this.workingReceives   = new ArrayList<>();
+        this.workingDeliveries = new ArrayList<>();
+    }
+
+
+    public boolean isCompleted(List<WarehouseItem> receiveRequest) {
+        return  !this.pendingReceives.contains(receiveRequest) &&
+                !this.workingReceives.contains(receiveRequest);
+    }
+
+
+    public boolean isCompleted(Pair<Shelf, List<WarehouseItem>> deliveryRequest) {
+        return  !this.pendingDeliveries.contains(deliveryRequest) &&
+                !this.workingDeliveries.contains(deliveryRequest);
+    }
+
+
+    public int getItemCount() {
+        return this.items.size();
     }
 
 
@@ -71,21 +131,28 @@ public class ShippingReceivingManager {
                 Vec2i where = deliveryPoints.remove(0);
 
                 Pair<Shelf, List<WarehouseItem>> delivery = Utility.Find(pendingDeliveries, x -> standing.contains(x.getValue0()));
+                Utility.Move(delivery, pendingDeliveries, workingDeliveries);
+
                 Robot robot = GetRemoveClosestRobot(free, new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().z));
 
-                Vec2i current = new Vec2i(robot.getPosition().x, robot.getPosition().z);
+                Utility.Move(delivery.getValue0(), standing, taken);
+                this.busy.add(robot);
+
+                Vec2i current  = new Vec2i(robot.getPosition().x, robot.getPosition().z);
+                Vec2i shelfpos = new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().z);
                 robot.setAction(new ActionCompound(
                         new ActionTransportObject(robot, delivery.getValue0(), current, where),
                         new ActionRunCommand(
                                 () -> {
+                                    workingDeliveries.remove(delivery);
+
                                     for (WarehouseItem i : delivery.getValue1()) {
-                                        this.storage.remove(i);
                                         delivery.getValue0().removeItem(i);
                                     }
                                 },
                                 TIME_TO_TRANSFER_ITEM * delivery.getValue1().size()
                         ),
-                        new ActionTransportObject(robot, delivery.getValue0(), where, where, current),
+                        new ActionTransportObject(robot, delivery.getValue0(), where, where, shelfpos),
                         new ActionRunCommand(() -> {
                             Utility.Move(delivery.getValue0(), taken, standing);
                             Utility.Move(robot, busy, free);
@@ -93,10 +160,6 @@ public class ShippingReceivingManager {
                             this.deliveryPoints.add(where);
                         })
                 ));
-
-                Utility.Move(delivery.getValue0(), standing, taken);
-                this.busy.add(robot);
-                this.pendingDeliveries.remove(delivery);
             }
         } else {
             if (!free.isEmpty() && !pendingReceives.isEmpty() && Utility.Contains(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY)) {
@@ -104,12 +167,16 @@ public class ShippingReceivingManager {
                 if (receivePoints.isEmpty()) return;
                 Vec2i where = receivePoints.remove(0);
 
-                List<WarehouseItem> receive = pendingReceives.remove(0);
+                List<WarehouseItem> receive = pendingReceives.get(0);
                 Shelf shelf    = Utility.FindRandom(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY);
                 Robot robot    = GetRemoveClosestRobot(free, new Vec2i(shelf.getPosition().x, shelf.getPosition().z));
                 int movecnt    = Math.min(receive.size(), SHELF_ITEM_CAPACITY - shelf.getItemCount());
                 Vec2i oldpos   = new Vec2i(robot.getPosition().x, robot.getPosition().z);
                 Vec2i shelfpos = new Vec2i(shelf.getPosition().x, shelf.getPosition().z);
+
+                Utility.Move(receive, pendingReceives, workingReceives);
+                Utility.Move(shelf, standing, taken);
+                this.busy.add(robot);
 
                 robot.setAction(new ActionCompound(
                         new ActionTransportObject(robot, shelf, oldpos, where),
@@ -132,33 +199,41 @@ public class ShippingReceivingManager {
 
                             this.receivePoints.add(where);
 
-                            if (receive.size() > 0) pendingReceives.add(receive);
+                            if (receive.size() > 0) {
+                                Utility.Move(receive, workingReceives, pendingReceives);
+                            } else {
+                                workingReceives.remove(receive);
+                            }
                         })
                 ));
-
-                Utility.Move(shelf, standing, taken);
-                this.busy.add(robot);
             }
         }
     }
 
 
     // Receive new objects into the warehouse.
-    public void receiveObjects(int count) {
+    public ReceivingToken receiveObjects(int count) {
         List<WarehouseItem> items = WarehouseItemFactory.instance.create(count);
+        List<List<WarehouseItem>> tokenContents = new ArrayList<>();
 
         for (int i = 0; i < items.size(); i+= SHELF_ITEM_CAPACITY) {
-            pendingReceives.add(new ArrayList<>(items.subList(i, i + Math.min(SHELF_ITEM_CAPACITY, items.size() - i))));
+            List<WarehouseItem> task = new ArrayList<>(items.subList(i, i + Math.min(SHELF_ITEM_CAPACITY, items.size() - i)));
+
+            pendingReceives.add(task);
+            tokenContents.add(task);
         }
+
+        return new ReceivingToken(this, tokenContents);
     }
 
 
     // Ship existing objects out of the warehouse.
-    public void shipObjects(int count) {
+    public ShippingToken shipObjects(int count) {
         Map<Shelf, List<WarehouseItem>> items = new HashMap<>();
+        List<Pair<Shelf, List<WarehouseItem>>> tokenContents = new ArrayList<>();
 
         for (int i = 0; i < count; ++i) {
-            WarehouseItem item = this.items.get(random.nextInt(this.items.size()));
+            WarehouseItem item = this.items.remove(random.nextInt(this.items.size()));
             Shelf shelf = storage.get(item);
 
             if (items.containsKey(shelf)) items.get(shelf).add(item);
@@ -166,20 +241,13 @@ public class ShippingReceivingManager {
         }
 
         for (Map.Entry<Shelf, List<WarehouseItem>> shelfitems : items.entrySet()) {
-            if (standing.contains(shelfitems.getKey())) {
-                // Shelf is standing at its normal position => if there are other orders for items from this shelf,
-                // we can merge them.
-                Pair<Shelf, List<WarehouseItem>> order = Utility.Find(pendingDeliveries, x -> x.getValue0() == shelfitems.getKey());
+            Pair<Shelf, List<WarehouseItem>> p = new Pair<>(shelfitems.getKey(), shelfitems.getValue());
 
-                if (order == null) pendingDeliveries.add(new Pair<>(shelfitems.getKey(), shelfitems.getValue()));
-                else order.getValue1().addAll(shelfitems.getValue());
-            } else {
-                // Shelf is moving somewhere => make a new order.
-                pendingDeliveries.add(new Pair<>(shelfitems.getKey(), shelfitems.getValue()));
-            }
+            pendingDeliveries.add(p);
+            tokenContents.add(p);
         }
 
-        for (List<WarehouseItem> i : items.values()) this.items.removeAll(i);
+        return new ShippingToken(this, tokenContents);
     }
 
 

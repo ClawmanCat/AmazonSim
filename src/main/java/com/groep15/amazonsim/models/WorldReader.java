@@ -26,6 +26,7 @@ public final class WorldReader {
             List<String> contents = Files.readAllLines(Paths.get(path), StandardCharsets.US_ASCII);
 
             Map<Character, JSONObject[]> legend = new HashMap<>();
+            legend.put(' ', new JSONObject[0]);
 
             // 1st pass: read legend.
             boolean inLegend = false;
@@ -92,6 +93,7 @@ public final class WorldReader {
 
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Reading world from disk failed: " + e.getMessage());
         }
     }

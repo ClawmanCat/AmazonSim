@@ -29,8 +29,10 @@ class SocketManager {
                     // Object does not yet exist => make a new one.
                     target = self.factory.create(json);
 
-                    self.addObject(target);
-                    console.log("Created new object with ID " + target.getID());
+                    if (target !== null) {
+                        self.addObject(target);
+                        console.log("Created new object with ID " + target.getID());
+                    }
                 } else {
                     // Object already exists => update it.
                     target.update(json);

@@ -27,7 +27,8 @@ public class Robot extends Object3D implements IWorldActor {
             obj.dirty = true;
         }
 
-        return this.action.progress(this);
+        this.action.progress(this);
+        return true;
     }
 
     @Override
