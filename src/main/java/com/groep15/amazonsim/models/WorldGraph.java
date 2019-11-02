@@ -2,6 +2,7 @@ package com.groep15.amazonsim.models;
 
 import com.groep15.amazonsim.models.ai.IWorldActor;
 import com.groep15.amazonsim.models.worldobject.Object3D;
+import com.groep15.amazonsim.models.worldobject.Truck;
 import com.groep15.amazonsim.utility.Direction;
 import com.groep15.amazonsim.utility.Utility;
 import com.groep15.amazonsim.utility.Vec2i;
@@ -36,7 +37,7 @@ public class WorldGraph {
 
             // Don't count objects that are being moved by an actor.
             boolean carried = false;
-            for (IWorldActor actor : actors) if (actor.getHeldObject() == o) { carried = true; break; }
+            for (IWorldActor actor : actors) if (!(actor instanceof Truck) && actor.getHeldObject() == o) { carried = true; break; }
             if (carried) continue;
 
             // Update map
@@ -64,7 +65,12 @@ public class WorldGraph {
                     new Vec2i(a.getPosition().x, a.getPosition().z)
             );
 
-            for (Vec2i v : path) tmpmap[v.x][v.y] = false;
+            // Since we're currently recalculating the path every tick,
+            // there's no point in looking at the distant future.
+            for (int i = 0; i < Math.min(3, path.size()); ++i) {
+                Vec2i v = path.get(i);
+                tmpmap[v.x][v.y] = false;
+            }
         }
 
         Map<Vec2i, Direction> parents = new HashMap<>();
@@ -94,42 +100,6 @@ public class WorldGraph {
         }
 
         return null;    // No path exists.
-    }
-
-
-    public boolean collides(IWorldActor actor, Vec2i start, List<Direction> path) {
-        Map<Vec2i, List<Integer>> occupations = new HashMap<>();
-
-        for (IWorldActor a : this.actors) {
-            if (a == actor) continue;
-
-            Vec2i apos = new Vec2i(a.getPosition().x, a.getPosition().z);
-            List<Direction> apath = a.getAction().getMovementFuture();
-
-            List<Vec2i> pathpos = Utility.DirectionsToPositions(apath, apos);
-
-            for (int i = 0; i < pathpos.size(); ++i) {
-                Vec2i pos = pathpos.get(i);
-
-                for (int j = -1; j <= 1; ++j) {
-                    if (i + j < 0) continue;
-
-                    // Occupy for 3 ticks to prevent semi-collisions
-                    if (occupations.containsKey(pos)) occupations.get(pos).add(i + j);
-                    else occupations.put(pos, new ArrayList<>(Arrays.asList(i + j)));
-                }
-            }
-        }
-
-        List<Vec2i> pathpos = Utility.DirectionsToPositions(path, start);
-
-        for (int i = 0; i < pathpos.size(); ++i) {
-            Vec2i pos = pathpos.get(i);
-
-            if (occupations.containsKey(pos) && occupations.get(pos).contains(i)) return true;
-        }
-
-        return false;
     }
 
 

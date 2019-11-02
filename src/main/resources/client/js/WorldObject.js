@@ -15,10 +15,11 @@ class WorldObjectFactory extends ISocketUpdatableFactory {
             case "shelf":           result = new Shelf(this.world, json);             break;
             case "light":           result = new Lamp(this.world, json);              break;
             case "truck":           result = new Truck(this.world, json);             break;
+            case "invisiblewall":   result = null;                                    break;
             default:                result = new Unknown(this.world, json);           break;
         }
 
-        this.world.addObject(result);
+        if (result !== null) this.world.addObject(result);
         return result;
     }
 }
@@ -149,8 +150,15 @@ class Shelf extends IWorldObject {
         if (this.boxes === null || this.boxes === undefined) return;
 
         for (let i = 0; i < 5; ++i) {
-            if (this.count >  i && !this.boxesAdded[i]) this.mesh.add(this.boxes[i]);
-            if (this.count <= i &&  this.boxesAdded[i]) this.mesh.remove(this.boxes[i]);
+            if (this.count >  i && !this.boxesAdded[i]) {
+                this.mesh.add(this.boxes[i]);
+                this.boxesAdded[i] = true;
+            }
+
+            if (this.count <= i &&  this.boxesAdded[i]) {
+                this.mesh.remove(this.boxes[i]);
+                this.boxesAdded[i] = false;
+            }
         }
     }
 
@@ -243,7 +251,16 @@ class Floor extends IWorldObject {
         let geometry = new THREE.PlaneGeometry(this.w, this.h, this.w, this.h);
         let materials = Utility.LoadTextureOrDefault(this.texture, 0.5, Floor.Materials, true);
 
-        return new THREE.Mesh(geometry, materials);
+        let group = new THREE.Group();
+        let mesh = new THREE.Mesh(geometry, materials);
+
+        if (this.texture === undefined || this.texture === "floor" || this.texture === "road") {
+            mesh.rotation.set(0, 0, (Math.PI / 2.0) * Utility.RandInt(3));
+        }
+
+        group.add(mesh);
+
+        return group;
     }
 }
 
@@ -489,7 +506,12 @@ class Truck extends IWorldObject {
         connector.scale.set(2, 2, 2);
         group.add(connector);
 
-        return group;
+        group.rotation.set(0, Math.PI, 0);
+
+        let wrapper = new THREE.Group();
+        wrapper.add(group);
+
+        return wrapper;
     }
 }
 

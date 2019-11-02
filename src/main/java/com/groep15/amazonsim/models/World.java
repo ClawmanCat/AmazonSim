@@ -9,7 +9,6 @@ import org.json.simple.JSONObject;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,7 @@ public class World implements Model {
 
 
     public Object getSetting(String key) {
-        List<String> keySegments = Arrays.asList(key.split("\\."));
+        String[] keySegments = key.split("\\.");
 
         Object o = settings;
         for (String segment : keySegments) o = ((JSONObject) o).get(segment);
