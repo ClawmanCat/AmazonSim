@@ -24,7 +24,7 @@ class Utility {
     }
 
 
-    static LoadTextureOrDefault(texture, shininess, defaultVal = null, flip = false, transparent = false) {
+    static LoadTextureOrDefault(texture, shininess, defaultVal = null, flip = false, transparent = false, side = THREE.DoubleSide) {
         if (texture === undefined || texture === null) return defaultVal;
 
         let textureData = new THREE.TextureLoader(THREE.DefaultLoadingManager).load("textures/" + texture + ".png");
@@ -32,7 +32,7 @@ class Utility {
         textureData.minFilter = THREE.NearestFilter;
         textureData.magFilter = THREE.NearestFilter;
 
-        return new THREE.MeshPhongMaterial({ map: textureData, side: THREE.DoubleSide, transparent: transparent, shininess: shininess });
+        return new THREE.MeshPhongMaterial({ map: textureData, side: side, transparent: transparent, shininess: shininess });
     }
 
 

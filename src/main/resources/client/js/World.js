@@ -6,6 +6,7 @@ class World {
         this.renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight + 5);
+        this.renderer.setClearColor(0xADD8E6);
 
         document.body.appendChild(this.renderer.domElement);
 
@@ -57,12 +58,17 @@ class World {
         this.down.position.set(0, -100000000, 0);
         this.scene.add(this.down);
 
+        let truck = new Truck(this, Utility.MakeWorldObjectJSON("fake-uuid", [ 20, 10, 15 ], [ 0, 0, 0 ], { opencount: 0 }));
+        this.addObject(truck);
+
         // Socket updater
         this.updater = new SocketManager(new WorldObjectFactory(this));
 
         // Render loop
         this.frameCount = 0;
         this.animate = () => {
+            truck.update(Utility.MakeWorldObjectJSON("fake-uuid", [0, 0, 0.01 * this.frameCount], [0, 0, 0], {}));
+
             //let camLookVec = new THREE.Vector3(0, 0, -1);
             //camLookVec.applyEuler(self.camera.rotation, self.camera.eulerOrder);
 
