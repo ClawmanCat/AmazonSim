@@ -32,7 +32,7 @@ public class Truck extends Object3D implements IWorldActor {
         this.distance  = 30;
         this.interval  = 5000;
         this.doorAngle = 0;
-        this.visible   = true;
+        this.visible   = false;
         this.action    = null;
     }
 
@@ -63,7 +63,9 @@ public class Truck extends Object3D implements IWorldActor {
     @Override
     public boolean update() {
         if (this.action == null) this.updateAction();
-        return this.action.progress(this);
+        this.action.progress(this);
+
+        return true;
     }
 
     @Override
@@ -110,7 +112,7 @@ public class Truck extends Object3D implements IWorldActor {
                 // Open doors.
                 new ActionLoop(
                         () -> new ActionRunCommand(() -> {
-                            this.doorAngle += (Math.PI / 2.0) / DOOR_OPEN_TIME;
+                            this.doorAngle += (1.15 * Math.PI / 2.0) / DOOR_OPEN_TIME;
                             i.set(i.get() + 1);
                         }),
                         () -> i.get() >= DOOR_OPEN_TIME
@@ -121,7 +123,8 @@ public class Truck extends Object3D implements IWorldActor {
 
                     token.set((this.task == Task.RECEIVING)
                             ? sr.receiveObjects(random.nextInt(TRUCK_ITEM_CAPACITY))
-                            : sr.shipObjects(random.nextInt(Math.min(sr.getItemCount(), TRUCK_ITEM_CAPACITY)))
+                            // The +1 and -1 are to prevent calling random.nextInt(0)
+                            : sr.shipObjects(random.nextInt(Math.min(sr.getItemCount() + 1, TRUCK_ITEM_CAPACITY + 1)) - 1)
                     );
                 }),
                 new ActionLoop(
@@ -131,7 +134,7 @@ public class Truck extends Object3D implements IWorldActor {
                 // Close doors.
                 new ActionLoop(
                         () -> new ActionRunCommand(() -> {
-                            this.doorAngle -= (Math.PI / 2.0) / DOOR_OPEN_TIME;
+                            this.doorAngle -= (1.15 * Math.PI / 2.0) / DOOR_OPEN_TIME;
                             i.set(i.get() - 1);
                         }),
                         () -> i.get() == 0

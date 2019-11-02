@@ -135,9 +135,11 @@ public class ShippingReceivingManager {
 
                 Robot robot = GetRemoveClosestRobot(free, new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().z));
 
-                for (WarehouseItem i : delivery.getValue1()) this.storage.remove(i);
+                Utility.Move(delivery.getValue0(), standing, taken);
+                this.busy.add(robot);
 
-                Vec2i current = new Vec2i(robot.getPosition().x, robot.getPosition().z);
+                Vec2i current  = new Vec2i(robot.getPosition().x, robot.getPosition().z);
+                Vec2i shelfpos = new Vec2i(delivery.getValue0().getPosition().x, delivery.getValue0().getPosition().z);
                 robot.setAction(new ActionCompound(
                         new ActionTransportObject(robot, delivery.getValue0(), current, where),
                         new ActionRunCommand(
@@ -150,7 +152,7 @@ public class ShippingReceivingManager {
                                 },
                                 TIME_TO_TRANSFER_ITEM * delivery.getValue1().size()
                         ),
-                        new ActionTransportObject(robot, delivery.getValue0(), where, where, current),
+                        new ActionTransportObject(robot, delivery.getValue0(), where, where, shelfpos),
                         new ActionRunCommand(() -> {
                             Utility.Move(delivery.getValue0(), taken, standing);
                             Utility.Move(robot, busy, free);
@@ -158,9 +160,6 @@ public class ShippingReceivingManager {
                             this.deliveryPoints.add(where);
                         })
                 ));
-
-                Utility.Move(delivery.getValue0(), standing, taken);
-                this.busy.add(robot);
             }
         } else {
             if (!free.isEmpty() && !pendingReceives.isEmpty() && Utility.Contains(standing, x -> x.getItemCount() < SHELF_ITEM_CAPACITY)) {
@@ -176,6 +175,8 @@ public class ShippingReceivingManager {
                 Vec2i shelfpos = new Vec2i(shelf.getPosition().x, shelf.getPosition().z);
 
                 Utility.Move(receive, pendingReceives, workingReceives);
+                Utility.Move(shelf, standing, taken);
+                this.busy.add(robot);
 
                 robot.setAction(new ActionCompound(
                         new ActionTransportObject(robot, shelf, oldpos, where),
@@ -205,9 +206,6 @@ public class ShippingReceivingManager {
                             }
                         })
                 ));
-
-                Utility.Move(shelf, standing, taken);
-                this.busy.add(robot);
             }
         }
     }
@@ -242,27 +240,11 @@ public class ShippingReceivingManager {
             else items.put(shelf, new ArrayList<>(Arrays.asList(item)));
         }
 
-
         for (Map.Entry<Shelf, List<WarehouseItem>> shelfitems : items.entrySet()) {
             Pair<Shelf, List<WarehouseItem>> p = new Pair<>(shelfitems.getKey(), shelfitems.getValue());
 
-            if (standing.contains(shelfitems.getKey())) {
-                // Shelf is standing at its normal position => if there are other orders for items from this shelf,
-                // we can merge them.
-                Pair<Shelf, List<WarehouseItem>> order = Utility.Find(pendingDeliveries, x -> x.getValue0() == shelfitems.getKey());
-
-                if (order == null) {
-                    pendingDeliveries.add(p);
-                    tokenContents.add(p);
-                } else {
-                    order.getValue1().addAll(shelfitems.getValue());
-                    tokenContents.add(order);
-                }
-            } else {
-                // Shelf is moving somewhere => make a new order.
-                pendingDeliveries.add(p);
-                tokenContents.add(p);
-            }
+            pendingDeliveries.add(p);
+            tokenContents.add(p);
         }
 
         return new ShippingToken(this, tokenContents);

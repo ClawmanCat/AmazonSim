@@ -12,8 +12,8 @@ This file is the default warehouse layout.
 {"key":"B", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"road" }}, {"type":"invisiblewall", "properties": { "y": 2.00 }}]}
 {"key":"0", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"shipping" }}]}
 {"key":"1", "value":[{"type":"floor", 		  "properties": { "y": 0.00, "texture":"receiving" }}]}
-{"key":"2", "value":[{"type":"truck"		  "properties": { "y": 3.65, "task":"shipping",  "interval":5000.0, "distance":27.0 }}]}
-{"key":"3", "value":[{"type":"truck"		  "properties": { "y": 3.65, "task":"receiving", "interval":5000.0, "distance":27.0 }}]}
+{"key":"2", "value":[{"type":"truck"		  "properties": { "y": 3.65, "task":"shipping",  "interval":1500.0, "distance":27.0 }}]}
+{"key":"3", "value":[{"type":"truck"		  "properties": { "y": 3.65, "task":"receiving", "interval":1500.0, "distance":27.0 }}]}
 #ENDLEGEND
 
 

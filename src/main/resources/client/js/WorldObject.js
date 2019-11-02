@@ -34,6 +34,7 @@ class IWorldObject extends ISocketUpdatable {
         this.position = new THREE.Vector3(0, 0, 0);
         this.rotation = new THREE.Vector3(0, 0, 0);
         this.mesh     = null;
+        this.blockPosUpdates = false;
 
         this.update(json);
     }
@@ -63,8 +64,10 @@ class IWorldObject extends ISocketUpdatable {
     update(json) {
         this.uuid = json.parameters.uuid;
 
-        this.setPosition(new THREE.Vector3(json.parameters.x, json.parameters.y, json.parameters.z));
-        this.setRotation(new THREE.Vector3(json.parameters.rotationX, json.parameters.rotationY, json.parameters.rotationZ));
+        if (!this.blockPosUpdates) {
+            this.setPosition(new THREE.Vector3(json.parameters.x, json.parameters.y, json.parameters.z));
+            this.setRotation(new THREE.Vector3(json.parameters.rotationX, json.parameters.rotationY, json.parameters.rotationZ));
+        }
     }
 
     getID()  {
@@ -150,7 +153,7 @@ class Shelf extends IWorldObject {
         if (this.boxes === null || this.boxes === undefined) return;
 
         for (let i = 0; i < 5; ++i) {
-            if (this.count >  i && !this.boxesAdded[i]) {
+            if (this.count > i && !this.boxesAdded[i]) {
                 this.mesh.add(this.boxes[i]);
                 this.boxesAdded[i] = true;
             }
@@ -275,14 +278,6 @@ class Lamp extends IWorldObject {
         Utility.LoadTextureOrDefault("light_side",   90), //FRONT
         Utility.LoadTextureOrDefault("light_side",   90)  //BACK
     ];
-    static LampEmissive = [
-        Utility.LoadTextureOrDefault("light_side_emissive",   90), //RIGHT
-        Utility.LoadTextureOrDefault("light_side_emissive",   90), //LEFT
-        Utility.LoadTextureOrDefault("light_top_emissive",    90), //TOP
-        Utility.LoadTextureOrDefault("light_bottom_emissive", 90), //BOTTOM
-        Utility.LoadTextureOrDefault("light_side_emissive",   90), //FRONT
-        Utility.LoadTextureOrDefault("light_side_emissive",   90)  //BACK
-    ];
 
     static HandleGeometry  = new THREE.BoxGeometry(18.0 / 32.0, 4.0 / 32.0, 4.0 / 32.0);
     static HandleMaterials = [
@@ -303,13 +298,10 @@ class Lamp extends IWorldObject {
 
         let cover = new THREE.Mesh(Lamp.LampGeometry, Lamp.LampMaterials);
         cover.position.set(0, 0.5, 0.1);
-
         group.add(cover);
 
         let light = new THREE.PointLight(0xFFFFAA, 1, 100);
         light.position.set(0, 0.6, 0);
-        //light.target = this.world.down;
-        light.castShadow = true;
         group.add(light);
 
         let handle = new THREE.Mesh(Lamp.HandleGeometry, Lamp.HandleMaterials);
@@ -406,24 +398,44 @@ class Truck extends IWorldObject {
     constructor(world, json) {
         super(world, json);
 
-        this.opencount = json.parameters.opencount;
+        this.door_angle = json.parameters.door_angle;
+        this.visible    = json.parameters.visible;
 
         this.left = null;
         this.right = null;
         this.wheels = [];
+        this.hidden = false;
     }
 
     update(json) {
         super.update(json);
 
-        //this.opencount = json.parameters.opencount;
+        this.door_angle = json.parameters.door_angle;
+        this.visible    = json.parameters.visible;
+        console.log(this.visible);
 
+        // Wheel animation
         if (this.wheels === undefined) return;
         for (let i = 0; i < this.wheels.length; ++i) {
             this.wheels[i].rotation.set(2 * json.parameters.z, 0, Math.PI / 2.0);
         }
 
-        this.left.rotation.set(0, Math.PI, 0);
+        // Door animation
+        this.left.rotation.set(0, -this.door_angle, 0);
+        this.right.rotation.set(0, this.door_angle, 0);
+
+        // Remove when leaving map (setting opacity doesn't seem to work properly, so just move it out of sight.)
+        this.blockPosUpdates = !this.visible;
+
+        if (!this.visible && !this.hidden) {
+            this.mesh.position.set(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z + 10000000);
+            this.hidden = true;
+        }
+
+        if (this.visible && this.hidden) {
+            this.mesh.position.set(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z - 10000000);
+            this.hidden = false;
+        }
     }
 
     makeMesh() {
@@ -441,17 +453,30 @@ class Truck extends IWorldObject {
         fender.rotation.set(0, 0, Math.PI / 2.0);
         group.add(fender);
 
+        let leftPivot = new THREE.Object3D();
+        leftPivot.position.set(64.0 / 32.0 / 2.0 + 1, 10.0 / 32.0 / 2.0, -288.0 / 32.0 / 2.0);
+
         let leftDoor = new THREE.Mesh(Truck.DoorGeometry, Truck.LeftMaterials);
-        leftDoor.position.set(64.0 / 32.0 / 2.0, 10.0 / 32.0 / 2.0, -288.0 / 32.0 / 2.0);
+        leftDoor.position.set(-1, 0, 0);
         leftDoor.rotation.set(0, Math.PI, 0);
-        group.add(leftDoor);
-        this.left = leftDoor;
+
+        leftPivot.add(leftDoor);
+        group.add(leftPivot);
+
+        this.left = leftPivot;
+
+
+        let rightPivot = new THREE.Object3D();
+        rightPivot.position.set(64.0 / 32.0 / 2.0 - 3, 10.0 / 32.0 / 2.0, -288.0 / 32.0 / 2.0);
 
         let rightDoor = new THREE.Mesh(Truck.DoorGeometry, Truck.RightMaterials);
-        rightDoor.position.set(-64.0 / 32.0 / 2.0, 10.0 / 32.0 / 2.0, -288.0 / 32.0 / 2.0);
+        rightDoor.position.set(1, 0, 0)
         rightDoor.rotation.set(0, Math.PI, 0);
-        group.add(rightDoor);
-        this.right = rightDoor;
+
+        rightPivot.add(rightDoor);
+        group.add(rightPivot);
+
+        this.right = rightPivot;
 
         let dx = 70.0 / 32.0; let dy = -2.65; let dz = -0.2; let ddz = -2.3, ddz2 = 7.75;
         let wheelpos = [
