@@ -2,6 +2,14 @@ class World {
     constructor () {
         // ThreeJS Renderer Setup
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.CubeTextureLoader(THREE.DefaultLoadingManager).load([
+                "textures/skybox.png",
+                "textures/skybox.png",
+                "textures/skybox.png",
+                "textures/skybox.png",
+                "textures/skybox.png",
+                "textures/skybox.png"
+            ]);
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);

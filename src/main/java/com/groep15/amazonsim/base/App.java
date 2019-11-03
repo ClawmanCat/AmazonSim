@@ -1,5 +1,6 @@
 package com.groep15.amazonsim.base;
 
+import com.groep15.amazonsim.controllers.Controller;
 import com.groep15.amazonsim.controllers.SimulationController;
 import com.groep15.amazonsim.models.WorldReader;
 import com.groep15.amazonsim.views.DefaultWebSocketView;
@@ -23,26 +24,21 @@ import java.io.IOException;
 @EnableAutoConfiguration
 @EnableWebSocket
 public class App extends SpringBootServletInitializer implements WebSocketConfigurer {
-    public static final String WORLD_PATH = new File("src/main/resources/layout/master.worlddef").getAbsolutePath();
+    public static final String WORLD_PATH     = new File("src/main/resources/layout/master.worlddef").getAbsolutePath();
+    public static final Controller Controller = new SimulationController(WorldReader.ReadWorld(WORLD_PATH));
 
-    public static SimulationController Controller = null;
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
 
-    private SimulationController controller;
-
     public App() {
-        this.controller = new SimulationController(WorldReader.ReadWorld(WORLD_PATH));
-        this.controller.start();
-
-        Controller = controller;
+        Controller.start();
     }
 
     @Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(App.class);
-	}
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(App.class);
+    }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -53,7 +49,7 @@ public class App extends SpringBootServletInitializer implements WebSocketConfig
         @Override
         public void afterConnectionEstablished(WebSocketSession session) {
             System.out.println("New client connected: " + session.getRemoteAddress().getAddress().toString());
-            controller.addView(new DefaultWebSocketView(session));
+            Controller.addView(new DefaultWebSocketView(session));
         }
 
         @Override
