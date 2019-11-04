@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Truck extends Object3D implements IWorldActor {
     public static final int DOOR_OPEN_TIME      = 60;
-    public static final int TRUCK_ITEM_CAPACITY = 64;
+    public static final int TRUCK_ITEM_CAPACITY = 96;
 
     private enum Task { SHIPPING, RECEIVING }
 
@@ -122,9 +122,12 @@ public class Truck extends Object3D implements IWorldActor {
                     ShippingReceivingManager sr = App.Controller.getSRManager();
 
                     token.set((this.task == Task.RECEIVING)
-                            ? sr.receiveObjects(random.nextInt(TRUCK_ITEM_CAPACITY))
+                            ? sr.receiveObjects(random.nextInt(TRUCK_ITEM_CAPACITY - 20) + 20)
                             // The +1 and -1 are to prevent calling random.nextInt(0)
-                            : sr.shipObjects(random.nextInt(Math.min(sr.getItemCount() + 1, TRUCK_ITEM_CAPACITY + 1)) - 1)
+                            : sr.shipObjects(Math.min(
+                                    sr.getItemCount(),
+                                    random.nextInt(TRUCK_ITEM_CAPACITY - 20) + 20
+                            ))
                     );
                 }),
                 new ActionLoop(

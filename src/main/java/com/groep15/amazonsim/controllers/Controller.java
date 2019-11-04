@@ -1,5 +1,6 @@
 package com.groep15.amazonsim.controllers;
 
+import com.groep15.amazonsim.controllers.wms.ShippingReceivingManager;
 import com.groep15.amazonsim.models.Model;
 import com.groep15.amazonsim.views.View;
 
@@ -60,4 +61,6 @@ public abstract class Controller implements Runnable, PropertyChangeListener {
     }
 
     public abstract void run();
+
+    public abstract ShippingReceivingManager getSRManager();
 }
