@@ -1,2 +1,2 @@
-# AmazonSim
-Amazon Robot Simulatie
+# WarehouseSim
+Warehouse Robot Simulator
